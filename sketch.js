@@ -285,6 +285,7 @@ function preload() {
 
 function setup() {
   createCanvas(VIEW_W, VIEW_H);
+   pixelDensity(1);
   imageMode(CORNER);
   startTime = millis();
   blueBuffer  = createGraphics(VIEW_W, VIEW_H);
