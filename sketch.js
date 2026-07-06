@@ -4,16 +4,30 @@
 // ============================================================
 
 // Screen manager
-let gameState = "start"; 
+let gameState = "level_picker"; 
 let startBg;
 let winBg;
 let lossBg;
 let bgImg;
 let start_penguin;
+let levelPickerBg;
+
+// Level picker assets
+let currentLevel = 1;
+let lock_icon;
+let check_icon;
+let info_box;
+let level1Complete = false;
+let level2Complete = false;
+let level3Complete = false;
 
 // Start screen penguin animation
 let testFrame = 0;
 let testFrameTimer = 0;
+
+// Avalanche penguin animation
+let avalancheFrame = 0;
+let avalancheFrameTimer = 0;
 
 // Buttons states:
 let startBtnPressed = false;
@@ -21,10 +35,11 @@ let winBtnPressed = false;
 let lossBtnPressed = false;
 let tutorialBtnPressed = false;
 let homeBtnPressed = false;
+let levelPickerBtnPressed = false;
 
 // Background stuff
 const VIEW_W  = 1200;
-const VIEW_H  = 800;
+const VIEW_H  = 780;
 let WORLD_W;
 let WORLD_H;
 const CAM_SMOOTHING = 0.08;
@@ -104,6 +119,19 @@ const SPRITES = {
     cropRight:  [0,0,0,0,0,0],
     cropTop:    [0,0,0,0,0,0],
     cropBottom: [0,0,0,0,0,0]
+  },
+
+  penguin_avalanche:{
+    frameWidth: 420,
+    frameHeight: 600 ,
+    numFrames: 6,
+    animSpeed: 25,
+    scale: 0.6,
+
+    cropLeft:  [0, 0, 5, 15, 5, 15],
+    cropRight: [0, 0, 0, 0, 0, 0],
+    cropTop:   [200, 200, 200, 200, 200, 200],
+    cropBottom:[0, 0, 0, 0, 0, 0]
   }
 };
 
@@ -138,6 +166,16 @@ let startTime;
 let gameEnded = false;  
 let finalTime = null;
 let flashTimer = 0;
+let fastestTimes = {
+    level1: null,
+    level2: null,
+    level3: null
+};
+let fastestTimesIsNew = {
+    level1: false,
+    level2: false,
+    level3: false
+};
 
 //STOMPING ANIMATION
 let stompAnimating = false;
@@ -172,17 +210,83 @@ let spikeImages = [];
 let spikes = [];
 let DEBUG_SPIKE_HITBOXES = false; //remove after testing
 
+// Tutorial text
+let tutorialActive = false;
+let tutorialAlpha = 0;
+let tutorialIndex = 0;
+let tutorialDelay = 0;
+let postTutorialTimerActive = false;
+let postTutorialTimer = 0;
+let postTutorialDelayFrames = 360; // 6 seconds
+let tutorialBox;
+let warningOutline;
+let maskBuffer;
+let avalancheBuffer;
+let tutorialSteps = [
+  {
+    text: "AVALANCHE\nWARNING\nIN {time} !",
+    //text
+    fill: [247, 20, 43],
+    size: 42,
+    // box
+    boxFill: tutorialBox,
+    yOffset: -20,
+    delay: 60
+  },
+  {
+    text: "The blizzard is picking up,\n we need to get down from the mountain.",
+    //text
+    fill: [255, 145, 48],
+    size: 36,
+    // box
+    boxFill: tutorialBox,
+    yOffset: -20,
+    delay: 20
+  },
+  {
+    text: "Use A, W, S, D to move around.",
+    //text
+    fill: [255, 145, 48],
+    size: 36,
+    // box
+    boxFill: tutorialBox,
+    yOffset: -5,
+    delay: 20
+  },
+  {
+    text: "Really can't see much eh? Try pressing space!\n But careful, stomping causes vibrations, which makes the \navalanche come 45 seconds faster!",
+    //text
+    fill: [255, 145, 48],
+    size: 28,
+    // box
+    boxFill: tutorialBox,
+    yOffset: -20,
+    delay: 20
+  }
+];
+
 function preload() {
   SPRITES.up.img = loadImage("assets/images/penguin_front.png");
   SPRITES.start_penguin.img = loadImage("assets/images/penguin_front.png");
   SPRITES.left.img = loadImage("assets/images/penguin_left.png");
   SPRITES.right.img = loadImage("assets/images/penguin_right.png");
   SPRITES.stomp.img = loadImage("assets/images/penguin_stomp.png");
+  SPRITES.penguin_avalanche.img = loadImage("assets/images/penguin_avalanche.png");
   startBg = loadImage("assets/images/start_screen.png");
   winBg   = loadImage("assets/images/win_screen.png");
   lossBg  = loadImage("assets/images/loss_screen.png");
+
+  levelPickerBg = loadImage("assets/images/level_picker.JPG");
+  lock_icon = loadImage("assets/images/lock_icon.png");
+  check_icon = loadImage("assets/images/check_icon.png");
+  info_box = loadImage("assets/images/level_info_box.png");
+
+
   start_penguin = loadImage("assets/images/start_penguin.png");
   gameFont = loadFont("assets/fonts/ZenDots-Regular.ttf");
+  tutorialBox = loadImage("assets/images/tutorial_box.png");
+  warningOutline = loadImage("assets/images/warning_octo.png");
+
   spikeImages[0] = loadImage("assets/images/spike_small.png");
   spikeImages[1] = loadImage("assets/images/spike_mid.png");
   spikeImages[2] = loadImage("assets/images/spike_tall.png");
@@ -285,64 +389,15 @@ function preload() {
 
 function setup() {
   createCanvas(VIEW_W, VIEW_H);
-   pixelDensity(1);
+  pixelDensity(1);
   imageMode(CORNER);
   startTime = millis();
   blueBuffer  = createGraphics(VIEW_W, VIEW_H);
   ringMaskBuffer = createGraphics(VIEW_W, VIEW_H);
   worldBuffer = createGraphics(VIEW_W, VIEW_H);
+  maskBuffer = createGraphics(200, 200);
+  avalancheBuffer = createGraphics(200, 200);
 }
-
-// Tutorial text
-let tutorialActive = false;
-let tutorialAlpha = 0;
-let tutorialIndex = 0;
-let tutorialDelay = 0;
-let postTutorialTimerActive = false;
-let postTutorialTimer = 0;
-let postTutorialDelayFrames = 360; // 6 seconds
-let tutorialSteps = [
-  {
-    text: "! AVALANCHE WARNING !\n{time}",
-    //text
-    fill: [233, 241, 242],
-    size: 36,
-    // box
-    boxFill: [209, 29, 29],
-    yOffset: -20,
-    delay: 60
-  },
-  {
-    text: "The blizzard is picking up,\n keep climbing to find shelter,",
-    //text
-    fill: [255, 145, 48],
-    size: 36,
-    // box
-    boxFill: [0, 92, 158],
-    yOffset: -20,
-    delay: 20
-  },
-  {
-    text: "Use A, W, D to move around.",
-    //text
-    fill: [255, 145, 48],
-    size: 36,
-    // box
-    boxFill: [0, 92, 158],
-    yOffset: -5,
-    delay: 20
-  },
-  {
-    text: "Really can't see much, try pressing space!\n But careful, stomping causes vibrations...",
-    //text
-    fill: [255, 145, 48],
-    size: 28,
-    // box
-    boxFill: [0, 92, 158],
-    yOffset: -20,
-    delay: 20
-  }
-];
 
 function drawSpikes() {
   for (let s of spikes) {
@@ -351,7 +406,7 @@ function drawSpikes() {
   }
 }
 
-function drawSpikeHitboxes() { //remove after debugging
+function drawSpikeHitboxes() {
   if (!DEBUG_SPIKE_HITBOXES) return;
   push();
   noFill();
@@ -409,10 +464,9 @@ function drawPenguinInWorld(g) {
 }
 
 function drawButton(label, x, y, w, h, pressedFlag) {
-  let hover = mouseX > x-w/2 && mouseX < x+w/2 &&
-              mouseY > y-h/2 && mouseY < y+h/2;
-
   let offsetY = pressedFlag ? 4 : 0;
+  let hover = mouseX > x - w/2 && mouseX < x + w/2 &&
+              mouseY > y - h/2 + offsetY && mouseY < y + h/2 + offsetY;
   let pulse = sin(frameCount * 0.07) * (hover ? 0 : 3);
 
   // shadow
@@ -444,30 +498,84 @@ function drawButton(label, x, y, w, h, pressedFlag) {
 
   fill(210, 230, 255);
   text(label, floor(x), floor(y+offsetY));
-
-  cursor(hover ? HAND : ARROW);
-
   return hover;
 }
 
+function drawTutorialButton(label, x, y, w, h, pressedFlag) {
+  let offsetY = pressedFlag ? 4 : 0;
+
+  // HITBOX (correct)
+  let hover = mouseX > x - w/2 && mouseX < x + w/2 &&
+              mouseY > y - h/2 + offsetY && mouseY < y + h/2 + offsetY;
+
+  // CLICK detection
+  let clicked = hover && mouseIsPressed;
+
+  // VISUAL pulse
+  let pulse = sin(frameCount * 0.07) * (hover ? 0 : 3);
+
+  // --- drawing code unchanged ---
+  noStroke();
+  fill(10, 20, 60, 130);
+  rect(floor(x-w/2+5), floor(y-h/2+5+offsetY), w, h, 8);
+
+  fill(hover ? 60 : 42, hover ? 90 : 68, hover ? 175 : 150, 230);
+  stroke(130, 170, 230, 200);
+  strokeWeight(3);
+  rect(floor(x-w/2+pulse/2), floor(y-h/2+offsetY+pulse/2), w-pulse, h-pulse, 8);
+  noStroke();
+
+  fill(255, 255, 255, 50);
+  rect(floor(x-w/2+pulse/2+4), floor(y-h/2+offsetY+pulse/2+4), w-pulse-8, 10, 4);
+
+  textFont(gameFont);
+  textSize(24);
+  textAlign(CENTER, CENTER);
+  textStyle(BOLD);
+
+  let textYOffset = -4;
+
+  for (let [ox,oy] of [[-2,-2],[2,-2],[-2,2],[2,2]]) {
+    fill(10, 20, 70, 200);
+    text(label, floor(x+ox), floor(y+offsetY+oy + textYOffset));
+  }
+
+  fill(210, 230, 255);
+  text(label, floor(x), floor(y+offsetY + textYOffset));
+  return { hover, clicked };
+}
+
 function draw() {
+  // START SCREEN
   if (gameState === "start") {
     drawStartScreen();
     return;
   }
 
+  // WIN SCREEN
   if (gameState === "win") {
     drawWinScreen();
     return;
   }
 
+  // LOSS SCREEN
   if (gameState === "loss") {
     drawLossScreen();
     return;
   }
 
+  // LEVEL PICKER
+  if (gameState === "level_picker") {
+    drawLevelPickerScreen();
+    return;
+  }
+
+  if (gameState === "placeholder") {
+    drawPlaceholderScreen();
+  }
+
   // -------------------------
-  // GAMEPLAY (unchanged)
+  // GAMEPLAY
   // -------------------------
   if (gameEnded) {
     gameState = "loss";
@@ -479,19 +587,33 @@ function draw() {
   updateCamera();
   updateStompAnimation();
 
-  // WIN CONDITION:
+  // -------------------------
+  // WIN CONDITION
+  // -------------------------
   let penguinScreenBottom =
-  (player.y - camY) * camZoom * bgScale;
+    (player.y - camY) * camZoom * bgScale;
 
   if (penguinScreenBottom < 0) {
-    // compute time survived
     let elapsed = floor((millis() - startTime) / 1000);
     finalTime = elapsed;
+
+    // update fastest time
+    let key = "level" + currentLevel;   // currentLevel = 1, 2, or 3
+    if (fastestTimes[key] === null || finalTime < fastestTimes[key]) {
+        fastestTimes[key] = finalTime;
+        fastestTimesIsNew[key] = true;
+    } else {
+        fastestTimesIsNew[key] = false;
+    }
+
 
     gameState = "win";
     return;
   }
 
+  // -------------------------
+  // WAVE DELAY + WAVE UPDATE
+  // -------------------------
   if (waveDelayActive) {
     waveDelay--;
     if (waveDelay <= 0) {
@@ -499,8 +621,14 @@ function draw() {
       startWaveForFrame(4);
     }
   }
-  if (waveActive) updateWave();
 
+  if (waveActive) {
+    updateWave();
+  }
+
+  // -------------------------
+  // DRAW WORLD
+  // -------------------------
   push();
   scale(camZoom * bgScale);
   translate(-camX, -camY);
@@ -509,12 +637,23 @@ function draw() {
   drawSpikeHitboxes();
   pop();
 
+  // -------------------------
+  // DRAW CHARACTER
+  // -------------------------
   drawCharacterOnScreen();
   drawPenguinHitbox();
+
+  // Capture world frame for X-ray ring
   baseWorldFrame = get();
+
+  // -------------------------
+  // BLIZZARD OVERLAY
+  // -------------------------
   drawBlizzardOverlay();
 
-  // X-ray ring (unchanged)
+  // -------------------------
+  // X-RAY RING
+  // -------------------------
   if (waveActive) {
     ringMaskBuffer.clear();
     ringMaskBuffer.noStroke();
@@ -548,8 +687,14 @@ function draw() {
     noTint();
   }
 
+  // -------------------------
+  // TIMER
+  // -------------------------
   drawTimer();
 
+  // -------------------------
+  // TUTORIAL POST-DELAY
+  // -------------------------
   if (postTutorialTimerActive) {
     postTutorialTimer++;
 
@@ -557,11 +702,14 @@ function draw() {
       postTutorialTimerActive = false;
       tutorialActive = true;
       gameState = "tutorial";
-      tutorialIndex = 3;  // final card
+      tutorialIndex = 3;
       tutorialDelay = tutorialSteps[3].delay;
     }
   }
 
+  // -------------------------
+  // TUTORIAL OVERLAY
+  // -------------------------
   if (tutorialActive) {
     drawTutorialOverlay();
   }
@@ -599,77 +747,19 @@ function drawUpAnimation(x, y) {
   image(cfg.img, x, y, dw, dh, sx, sy, sw, sh);
 }
 
-function drawStartScreen() {
-  imageMode(CORNER);
-  image(startBg, 0, 0, width, height);
-  textFont(gameFont);
-  stroke(10, 15, 54);
-  strokeWeight(8);
-  textAlign(CENTER);
-  textSize(72);
-  fill(235, 132, 30);
-  text("the Mountains", width / 2, height / 2 - 108);
-  fill(245, 155, 66);  
-  text("Straight Towards", width / 2, height / 2 - 170);
-  let bx = width/2;
-  let by = 400;
-  let hover = drawButton("Start", bx, by, 320, 64, startBtnPressed);
-
-
- //imageMode(CENTER);
-  //image(start_penguin, width/2, 720, 399, 456);
-
-  animateUpTest();
-  drawUpAnimation(420, 470);
-}
-
-function drawWinScreen() {
-  image(winBg, 0, 0, width, height);
-  fill(255);
-  stroke(10, 15, 54);
-  strokeWeight(8);
-  textSize(36);
-  textAlign(CENTER);
-  textFont(gameFont);
-  let minutes = floor(finalTime / 60);
-  let seconds = finalTime % 60;
-  let timeText = minutes + ":" + nf(seconds, 2);
-  text(timeText, width / 2, height / 2 + 10);
-  
-  drawButton("Home", width/2, height*0.90, 260, 56, homeBtnPressed);
-
-
-}
-
-function drawLossScreen() {
-  image(lossBg, 0, 0, width, height);
-
-  fill(245, 155, 66);
-  stroke(10, 15, 54);
-  strokeWeight(8);
-  textFont(gameFont);
-  textAlign(CENTER);
-  textSize(36);
-  
-  drawButton("Try Again", width/2, height*0.45, 320, 64, lossBtnPressed);
-  drawButton("Home", width/2, height*0.90, 260, 56, homeBtnPressed);
-}
-
 function drawTutorialOverlay() {
   // Count down delay
   if (tutorialDelay > 0) {
     tutorialDelay--;
-    return;   // ← DO NOT DRAW THE CARD YET
+    return;
   }
 
   let step = tutorialSteps[tutorialIndex];
 
   // Format timer
   let rawText = step.text;
-  let elapsed = floor((millis() - startTime) / 1000);
-  let timeLeft = max(0, totalTime - elapsed);
-  let minutes = floor(timeLeft / 60);
-  let seconds = timeLeft % 60;
+  let minutes = floor(totalTime / 60);
+  let seconds = totalTime % 60;
   let formatted = minutes + ":" + nf(seconds, 2);
   let displayText = rawText.replace("{time}", formatted);
 
@@ -678,32 +768,166 @@ function drawTutorialOverlay() {
   textFont(gameFont);
 
   // Box
-  fill(...step.boxFill);
-  stroke(10, 15, 54);
-  strokeWeight(12);
-  rect(width/2 - 400, height/2 - 100, 800, 240, 20);
+  imageMode(CENTER);
+  image(tutorialBox, width/2, height/2 + 20, 820, 460);
+  imageMode(CORNER);
 
   // Text
   fill(step.fill[0], step.fill[1], step.fill[2]);
   textSize(step.size);
   stroke(10, 15, 54);
   strokeWeight(8);
-  text(displayText, width/2, height/2 + step.yOffset);
+  if (tutorialIndex === 0) {
+    textAlign(LEFT, CENTER);
+    let rightEdge = width/2 - 80;
+    text(displayText, rightEdge - 10, height/2+10);
+  } else {
+    textAlign(CENTER, CENTER);
+    text(step.text, width/2, height/2 - 20);
+  }
+  if (tutorialIndex === 0) {
+    drawOctagon(width/2 - 230, height/2 + 17, 95, 255);
+    animateAvalanche();
+    avalancheBuffer.clear();
+    drawAvalancheToBuffer(avalancheBuffer);
+    maskBuffer.clear();
+    drawOctagonMask(maskBuffer, 98);
+    let avalancheImgMasked = avalancheBuffer.get();
+    avalancheImgMasked.mask(maskBuffer);
+    image(avalancheImgMasked, width/2 - 335, height/2 - 80);
+    image(warningOutline, width/2 - 330, height/2 - 80, 200, 200);
+  }
 
-  drawButton("Continue", width/2, height*0.60, 320, 64, tutorialBtnPressed);
+  let btn = drawTutorialButton("OK", width/2 + 280, height*0.62, 100, 45, tutorialBtnPressed);
+  if (btn.hover) {
+    cursor(HAND);
+  } else {
+    cursor(ARROW);
+  }
+
+  if (btn.clicked) {
+      tutorialBtnPressed = true;
+  }
   pop()
+}
+
+function drawOctagon(cx, cy, radius, fillCol) {
+  push();
+  translate(cx, cy);
+  rotate(PI / 8);
+  noStroke();
+  fill(fillCol);
+  beginShape();
+  for (let i = 0; i < 8; i++) {
+    let angle = TWO_PI * i / 8;
+    let x = cos(angle) * radius;
+    let y = sin(angle) * radius;
+    vertex(x, y);
+  }
+  endShape(CLOSE);
+  pop();
+}
+
+function drawOctagonMask(g, radius) {
+  g.push();
+  g.clear();
+  g.noStroke();
+  g.fill(255);
+
+  g.translate(g.width/2, g.height/2);
+  g.rotate(PI/8);
+
+  g.beginShape();
+  for (let i = 0; i < 8; i++) {
+    let angle = TWO_PI * i / 8;
+    let x = cos(angle) * radius;
+    let y = sin(angle) * radius;
+    g.vertex(x, y);
+  }
+  g.endShape(CLOSE);
+
+  g.pop();
+}
+
+function drawAvalancheToBuffer(g) {
+  let cfg = SPRITES.penguin_avalanche;
+  let f = avalancheFrame;
+  let yOffset = 20;
+  let xOffset = -9;
+
+  let cropL = cfg.cropLeft[f] || 0;
+  let cropR = cfg.cropRight[f] || 0;
+  let cropT = cfg.cropTop[f] || 0;
+  let cropB = cfg.cropBottom[f] || 0;
+
+  let sx = f * cfg.frameWidth + cropL;
+  let sy = cropT;
+  let sw = cfg.frameWidth - cropL - cropR;
+  let sh = cfg.frameHeight - cropT - cropB;
+
+  let dw = sw * cfg.scale;
+  let dh = sh * cfg.scale;
+
+  g.image(
+    cfg.img,
+    (g.width - dw) / 2 + xOffset,
+    (g.height - dh) / 2 + yOffset,
+    dw,
+    dh,
+    sx,
+    sy,
+    sw,
+    sh
+  );
+}
+
+function animateAvalanche() {
+  let cfg = SPRITES.penguin_avalanche;
+
+  avalancheFrameTimer++;
+
+  if (avalancheFrameTimer >= cfg.animSpeed) {
+    avalancheFrameTimer = 0;
+    avalancheFrame = (avalancheFrame + 1) % cfg.numFrames;
+  }
+}
+
+function drawAvalanche(x, y) {
+  let cfg = SPRITES.penguin_avalanche;
+
+  let f = avalancheFrame;
+
+  let cropL = cfg.cropLeft[f] || 0;
+  let cropR = cfg.cropRight[f] || 0;
+  let cropT = cfg.cropTop[f] || 0;
+  let cropB = cfg.cropBottom[f] || 0;
+
+  let sx = f * cfg.frameWidth + cropL;
+  let sy = cropT;
+  let sw = cfg.frameWidth - cropL - cropR;
+  let sh = cfg.frameHeight - cropT - cropB;
+
+  let dw = sw * cfg.scale;
+  let dh = sh * cfg.scale;
+
+  image(
+    cfg.img,
+    x,
+    y,
+    dw,
+    dh,
+    sx,
+    sy,
+    sw,
+    sh
+  );
 }
 
 function keyPressed() {
   // START SCREEN → ENTER → TUTORIAL
   if (gameState === "start" && keyCode === ENTER) {
-    resetGame();
-    gameState = "tutorial";
-    tutorialActive = true;
-    tutorialAlpha = 0;
-    tutorialIndex = 0;
-    tutorialDelay = 40;   // optional: 0.5 sec before ENTER works
-    return;
+      gameState = "level_picker";
+      return;
   }
 
   // TUTORIAL → ENTER → PLAYING
@@ -716,6 +940,7 @@ function keyPressed() {
       gameState = "playing";             // allow movement
       postTutorialTimerActive = true;    // start countdown
       postTutorialTimer = 0;
+      cursor(ARROW);
       return;
     }
 
@@ -740,6 +965,7 @@ function keyPressed() {
   if (gameState === "loss" && key === "r") {
     resetGame();
     gameState = "playing";
+    cursor(ARROW)
     return;
   }
 
@@ -757,10 +983,10 @@ function resetGame() {
 
   totalTime = 150;   // reset timer
 
-  tutorialActive = false;          // <-- FIX
-  postTutorialTimerActive = false; // <-- FIX
-  tutorialIndex = 0;               // <-- FIX
-  tutorialDelay = 0;               // <-- FIX
+  tutorialActive = false;
+  postTutorialTimerActive = false;
+  tutorialIndex = 0;
+  tutorialDelay = 0;
 
   player.x = WORLD_W_SCALED / 2;
   player.y = WORLD_H_SCALED + 0;
@@ -770,8 +996,6 @@ function resetGame() {
   waveActive = false;
   waveRadius = 0;
 }
-
-
 
 function pointSide(px, py, x1, y1, x2, y2) {
   return (x2 - x1) * (py - y1) - (y2 - y1) * (px - x1);
@@ -814,6 +1038,23 @@ function drawTimer() {
 
   let timerText = minutes + ":" + nf(seconds, 2);
 
+  // body
+  let w = 200;
+  let h = 70;
+  let x = VIEW_W/2;
+  let y = 70;
+
+  // body
+  fill(42, 68, 150, 230);
+  stroke(130, 170, 230, 200);
+  strokeWeight(3);
+  rect(floor(x-w/2), floor(y-h/2), w, h, 8);
+  noStroke();
+
+  // shine
+  fill(255, 255, 255, 50);
+  rect(floor(x-w/2+4), floor(y-h/2+4), w-8, 10, 4);
+
   // FLASH LOGIC
   if (flashTimer > 0) {
     flashTimer--;
@@ -829,17 +1070,16 @@ function drawTimer() {
     if (timeLeft <= 10) {
       fill(255, 0, 0);
     } else {
-      fill(168, 247, 247);  // your normal color
+      fill(255);  // your normal color
     }
   }
 
-
-  textAlign(CENTER);
-  stroke(10, 15, 54);
-  strokeWeight(8);
-  textSize(32);
+  // label
   textFont(gameFont);
-  text(timerText, width / 2, 60);
+  textSize(42);
+  textAlign(CENTER, CENTER);
+  textStyle(BOLD);
+  text(timerText, width / 2, 65);
 }
 
 function drawSadEnding() {
@@ -856,7 +1096,7 @@ function handleInput() {
 
   if (stompAnimating) {
     player.isMoving = false;
-    return;   // completely skip movement logic
+    return;
   }
 
   let newX = player.x;
@@ -886,7 +1126,7 @@ function handleInput() {
     stompFrameTimer = 0;
     waveDelay = 0;
     waveDelayActive = false;
-    totalTime = max(0, totalTime - 20);
+    totalTime = max(0, totalTime - 45); // time penalty for stomp
     flashTimer= 150;
   }
 
@@ -1098,161 +1338,172 @@ function drawBlizzardOverlay() {
 }
 
 function mousePressed() {
-  let bx, by, bw = 320, bh = 64;
-
-  // --- START SCREEN BUTTON ---
-  if (gameState === "start") {
-    let bx = width/2, by = 400, bw = 320, bh = 64; 
-    if (mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
-        mouseY > by-bh/2 && mouseY < by+bh/2) {
-      startBtnPressed = true;
+    // --- PLAY BUTTON PRESS (inside info panel) ---
+    if (gameState === "level_picker" && activePanelIndex !== -1) {
+      if (levelPanels[activePanelIndex].playHover) {
+        playBtnPressed[activePanelIndex] = true;
+      }
     }
-  }
 
-  // --- WIN SCREEN BUTTON ---
-  if (gameState === "win") {
-    bx = width/2;
-    by = height * 0.82;
-
-    if (mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
-        mouseY > by-bh/2 && mouseY < by+bh/2) {
-      winBtnPressed = true;
+    // --- LEVEL PICKER CLICK ---
+    if (gameState === "level_picker") {
+        handleLevelPickerClick();
+        return;
     }
-  }
 
-  // --- LOSS SCREEN BUTTON ---
-  if (gameState === "loss") {
-    bx = width/2;
-    by = height * 0.45;
-    bw = 320;
-    bh = 64
+    /// --- START SCREEN BUTTON PRESS ---
+    if (gameState === "start") {
+      let bx = width/2, by = 400, bw = 320, bh = 64;
 
-    if (mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
-        mouseY > by-bh/2 && mouseY < by+bh/2) {
-      lossBtnPressed = true;
+      if (mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
+          mouseY > by-bh/2 && mouseY < by+bh/2) {
+        startBtnPressed = true;
+      }
+      return;
     }
-  }
 
-  // --- TUTORIAL BUTTON (optional future use) ---
-  if (gameState === "tutorial") {
-    bx = width/2;
-    by = height * 0.60;
-    bw = 320;
-    bh = 64
+    // --- WIN SCREEN BUTTON ---
+    if (gameState === "win") {
+        let bx = width/2;
+        let by = height * 0.82;
+        let bw = 320;
+        let bh = 64;
 
-    if (mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
-        mouseY > by-bh/2 && mouseY < by+bh/2) {
-      tutorialBtnPressed = true;
+        if (mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
+            mouseY > by-bh/2 && mouseY < by+bh/2) {
+            winBtnPressed = true;
+        }
     }
-  }
 
-  // --- HOME BUTTON (win + loss screens) ---
-  if (gameState === "win" || gameState === "loss") {
-    let bx = width/2, by = height*0.90, bw = 260, bh = 56;
-    if (mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
-        mouseY > by-bh/2 && mouseY < by+bh/2) {
-      homeBtnPressed = true;
+    // --- LOSS SCREEN BUTTON ---
+    if (gameState === "loss") {
+        let bx = width/2;
+        let by = height * 0.45;
+        let bw = 320;
+        let bh = 64;
+
+        if (mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
+            mouseY > by-bh/2 && mouseY < by+bh/2) {
+            lossBtnPressed = true;
+        }
     }
-  }
+
+    // --- LEVEL PICKER BUTTON (win + loss screens) ---
+    if (gameState === "win" || gameState === "loss") {
+      let bx = width/2, by = height*0.90, bw = 320, bh = 56;
+
+      if (mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
+          mouseY > by-bh/2 && mouseY < by+bh/2) {
+        levelPickerBtnPressed = true;
+      }
+    }
+
+    // --- TUTORIAL BUTTON CLICK ---
+    if (gameState === "tutorial" && tutorialActive) {
+        let x = width/2 + 280;
+        let y = height * 0.62;
+        let w = 100;
+        let h = 45;
+        let offsetY = tutorialBtnPressed ? 4 : 0;
+        let hover =
+          mouseX > x - w/2 &&
+          mouseX < x + w/2 &&
+          mouseY > y - h/2 + offsetY &&
+          mouseY < y + h/2 + offsetY;
+        if (hover) {
+            tutorialBtnPressed = true;
+            // advance tutorial
+            tutorialIndex++;
+            if (tutorialIndex >= tutorialSteps.length) {
+                tutorialActive = false;
+                cursor(ARROW);
+                gameState = "playing";
+            } else {
+                tutorialDelay = tutorialSteps[tutorialIndex].delay;
+            }
+        }
+    }
+
 }
 
 function mouseReleased() {
-  let bx, by, bw = 320, bh = 64;
-
   // --- START SCREEN BUTTON RELEASE ---
   if (gameState === "start") {
-    let bx = width/2, by = 400, bw = 320, bh = 64; 
-    if (startBtnPressed &&
-        mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
-        mouseY > by-bh/2 && mouseY < by+bh/2) {
+    let bx = width/2, by = 400, bw = 320, bh = 64;
 
-      resetGame();
-      gameState = "tutorial";
-      tutorialActive = true;
-      tutorialIndex = 0;
-      tutorialDelay = tutorialSteps[0].delay;
+    let hover =
+      mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
+      mouseY > by-bh/2 && mouseY < by+bh/2;
+
+    if (startBtnPressed && hover) {
+      gameState = "level_picker";
     }
+
     startBtnPressed = false;
+    return;
   }
 
-  // --- WIN SCREEN BUTTON RELEASE ---
-  if (gameState === "win") {
-    bx = width/2;
-    by = height * 0.82;
-
-    if (winBtnPressed &&
-        mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
-        mouseY > by-bh/2 && mouseY < by+bh/2) {
-
-      resetGame();
-      gameState = "playing";
-    }
-    winBtnPressed = false;
-  }
-
-  // --- LOSS SCREEN BUTTON RELEASE ---
-  if (gameState === "loss") {
-    bx = width/2;
-    by = height * 0.45;
-    bw = 320;
-    bh = 64
-
-    if (lossBtnPressed &&
-        mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
-        mouseY > by-bh/2 && mouseY < by+bh/2) {
-
-      resetGame();
-      gameState = "playing";
-    }
-    lossBtnPressed = false;
-  }
-
-  // --- TUTORIAL BUTTON RELEASE (optional) ---
+  // --- TUTORIAL CONTINUE BUTTON RELEASE ---
   if (gameState === "tutorial") {
-    bx = width/2;
-    by = height * 0.60;
-    bw = 320;
-    bh = 64;
+    let bx = width/2, by = height * 0.60, bw = 320, bh = 64;
 
-    if (tutorialBtnPressed &&
-        mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
-        mouseY > by-bh/2 && mouseY < by+bh/2) {
+    let hover =
+      mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
+      mouseY > by-bh/2 && mouseY < by+bh/2;
 
-      // Same logic as pressing ENTER
-      if (tutorialDelay <= 0) {
-        tutorialIndex++;
+    if (tutorialBtnPressed && hover && tutorialDelay <= 0) {
+      tutorialIndex++;
 
-        if (tutorialIndex === 3) {
-          tutorialActive = false;
-          gameState = "playing";
-          postTutorialTimerActive = true;
-          postTutorialTimer = 0;
-        } else if (tutorialIndex < tutorialSteps.length) {
-          tutorialDelay = tutorialSteps[tutorialIndex].delay;
-        } else {
-          tutorialActive = false;
-          gameState = "playing";
-        }
+      if (tutorialIndex === 3) {
+        tutorialActive = false;
+        gameState = "playing";
+        postTutorialTimerActive = true;
+        postTutorialTimer = 0;
+      } else if (tutorialIndex < tutorialSteps.length) {
+        tutorialAlpha = 255;
+        tutorialDelay = tutorialSteps[tutorialIndex].delay;
+      } else {
+        tutorialActive = false;
+        gameState = "playing";
       }
     }
+
     tutorialBtnPressed = false;
+    return;
   }
 
-  // --- HOME BUTTON RELEASE ---
-  if (gameState === "win" || gameState === "loss") {
-    let bx = width/2, by = height*0.90, bw = 260, bh = 56;
+  // --- LEVEL PICKER PLAY BUTTON RELEASE ---
+  if (gameState === "level_picker" && activePanelIndex !== -1) {
+    let i = activePanelIndex;
 
-    if (homeBtnPressed &&
-        mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
-        mouseY > by-bh/2 && mouseY < by+bh/2) {
-
-      // Go back to start screen
-      gameState = "start";
+    if (playBtnPressed[i] && levelPanels[i].playHover) {
+      startLevel(i);
     }
 
-    homeBtnPressed = false;
+    playBtnPressed[i] = false;
+    return;
+  }
+
+  // --- WIN / LOSS LEVEL PICKER BUTTON RELEASE ---
+  if (gameState === "win" || gameState === "loss") {
+    let bx = width/2, by = height*0.90, bw = 320, bh = 56;
+
+    let hover =
+      mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
+      mouseY > by-bh/2 && mouseY < by+bh/2;
+
+    if (levelPickerBtnPressed && hover) {
+      gameState = "level_picker";
+    }
+
+    levelPickerBtnPressed = false;
+    lossBtnPressed = false;
+    winBtnPressed = false;
+    return;
   }
 }
+
+
 
 
 
