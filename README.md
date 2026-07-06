@@ -47,7 +47,11 @@ After the showcase, we identified two additional improvements that would further
 | `assets/images/win_screen.png`              | Screens, spike and penguin images - ChatGPT.com        [6] |
 | `assets/images/map.png`                     | TBD                                                    [-] |
 | `assets/images/fish.png`                    | TBD                                                    [-] |
+| `assets/images/checkmark.png`               | TBD                                                    [-] |
+| `assets/images/lock.png`                    | TBD                                                    [-] |
 | `assets/sounds/stomp.mp3`                   | TBD                                                    [-] |
+| `assets/images/fish.png`                    | TBD                                                    [-] |
+| `assets/images/box .png`                    | TBD                                                    [-] |
 | `assets/sounds/background_music.mp3`        | TBD                                                    [-] |
 | `assets/sounds/collect_fish.mp3`            | TBD                                                    [-] |
 | `assets/sounds/ouch.mp3`                    | TBD                                                    [-] |
