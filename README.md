@@ -54,7 +54,6 @@ After the showcase, we identified two additional improvements that would further
 
 ## References
 [1]
-
 2026. Check out this chat. ChatGPT. Retrieved June 28, 2026 from https://chatgpt.com/share/6a38b0a0-d964-83ea-b273-7854ec0e107f 
 
 [2]
