@@ -4,7 +4,7 @@
 // ============================================================
 
 // Screen manager
-let gameState = "win"; 
+let gameState = "tutorial"; 
 let startBg;
 let winBg;
 let lossBg;
@@ -81,30 +81,30 @@ const SPRITES = {
 
   left: {
     img: null,
-    frameWidth: 327,
-    frameHeight: 254,
-    numFrames: 4,
+    frameWidth: 374,
+    frameHeight: 275,
+    numFrames: 6,
     animSpeed: 9,
     scale: 0.37,
 
-    cropLeft:  [0, 0, 70, 110],
-    cropRight: [90, 30, 0, 0],
-    cropTop:   [0, 0, 0, 0],
-    cropBottom:[0, 0, 0, 0]
+    cropLeft:  [25, 35, 45, 55, 65, 75],
+    cropRight: [0, 0, 0, 0, 0, 0],
+    cropTop:   [0, 0, 0, 0, 0, 0],
+    cropBottom:[0, 0, 0, 0, 0, 0]
   },
 
   right: {
     img: null,
-    frameWidth: 332,
-    frameHeight: 263,
-    numFrames: 5, // make 4
+    frameWidth: 374,
+    frameHeight: 273,
+    numFrames: 6,
     animSpeed: 7,
     scale: 0.37,
 
-    cropLeft:  [0, 0, 0, 0],
-    cropRight: [0, 0, 0, 0],
-    cropTop:   [0, 0, 0, 0],
-    cropBottom:[0, 0, 0, 0]
+    cropLeft:  [0, 8, 8, 8, 30, 30],
+    cropRight: [0, 0, 0, 0, 0, 0],
+    cropTop:   [0, 0, 0, 0, 0, 0],
+    cropBottom:[0, 0, 0, 0, 0, 0],
   },
 
   down: {
@@ -215,10 +215,10 @@ let stompOffsetY = 0;
 const SPIKE_DRAW_W = 60;
 const SPIKE_DRAW_H = 60;
 const SPIKE_HITBOXES = [
-  { w: 40, h: 50, offsetX: 7, offsetY: 5 },  // small spike
-  { w: 45, h: 50, offsetX: 10, offsetY: 5 },  // mid spike
-  { w: 55, h: 55, offsetX: 2, offsetY: 0 },  // tall spike
-  { w: 57, h: 60, offsetX: 0, offsetY: 0 }   // double spike
+  { w: 30, h: 40, offsetX: 14, offsetY: 15 },  // small spike
+  { w: 45, h: 40, offsetX: 8, offsetY: 15 },  // mid spike
+  { w: 48, h: 40, offsetX: 7, offsetY: 17 },  // tall spike
+  { w: 45, h: 40, offsetX: 5, offsetY: 15 }   // double spike
 ];
 let spikeImages = [];
 let spikes = [];
@@ -239,7 +239,7 @@ let tutorialBox;
 let warningOutline;
 let maskBuffer;
 let avalancheBuffer;
-let boxKey; //// ************************* NEWWWWW LINEEEE ***************** /////
+let boxKey;
 let tutorialSteps = [
   {
     text: "AVALANCHE\nWARNING\nIN {time} !",
@@ -356,7 +356,7 @@ function preload() {
     bgScale = Math.max(VIEW_W / WORLD_W, VIEW_H / WORLD_H);
     WORLD_W_SCALED = WORLD_W * bgScale;
     WORLD_H_SCALED = WORLD_H * bgScale;
-    WORLD_TOP_LIMIT = WORLD_H_SCALED / 2 - 300;
+    WORLD_TOP_LIMIT = WORLD_H_SCALED / 2 - 100;
     fish.x = WORLD_W_SCALED/2 - 230;
     fish.y = WORLD_H_SCALED/2 + 740;
 
@@ -608,7 +608,7 @@ function drawSpikeHitboxes() {
     let hb = SPIKE_HITBOXES[s.variant];
     if (!hb) continue;
 
-    // BLUE = full spike image border
+    // BLUE = full spike sprite bounds
     stroke(0, 140, 255);
     strokeWeight(3 / (camZoom * bgScale));
     rect(s.x, s.y, SPIKE_DRAW_W, SPIKE_DRAW_H);
@@ -626,6 +626,7 @@ function drawSpikeHitboxes() {
 
   pop();
 }
+
 
 function drawPenguinHitbox() {
   if (!DEBUG_PENGUIN_HITBOX) return;
@@ -848,13 +849,12 @@ function draw() {
     }
   }
 
-  // -------------------------
-  // WIN CONDITION
-  // -------------------------
-  let penguinScreenBottom =
-    (player.y - camY) * camZoom * bgScale;
+// -------------------------
+// WIN CONDITION (correct)
+// -------------------------
+  let feetY_screen = (player.y - camY) * camZoom * bgScale;
 
-  if (player.y < WORLD_TOP_LIMIT && fish.collected) {
+  if (feetY_screen < 0 && fish.collected) {
       let elapsed = floor((millis() - startTime) / 1000);
       finalTime = elapsed;
 
@@ -882,6 +882,9 @@ function draw() {
 
       tutorialActive = false;
       postTutorialTimerActive = false;
+
+      gameState = "win";
+      return;
   }
 
   // WAVE DELAY + WAVE UPDATE
@@ -1330,6 +1333,11 @@ function drawAvalanche(x, y) {
 }
 
 function keyPressed() {
+
+  if (key === "h" || key === "H") {
+    DEBUG_PENGUIN_HITBOX = !DEBUG_PENGUIN_HITBOX;
+    DEBUG_SPIKE_HITBOXES = !DEBUG_SPIKE_HITBOXES;
+  }
   // START SCREEN → ENTER → TUTORIAL
   if (gameState === "start" && keyCode === ENTER) {
       gameState = "level_picker";
@@ -1955,7 +1963,7 @@ function mouseReleased() {
   }
 }
 
-  function drawSpikeEditor() {
+function drawSpikeEditor() {
     if (!editorCleared) {
       spikes = [];
       editorCleared = true;
@@ -2007,9 +2015,9 @@ function mouseReleased() {
       20,
       30
     );
-  }
+}
 
-  function printSpikeCode() {
+function printSpikeCode() {
     let code = "spikes = [\n";
 
     for (let s of spikes) {
@@ -2025,7 +2033,7 @@ function mouseReleased() {
     }).catch(() => {
       alert("Could not auto-copy. Check the console instead.");
     });
-  }
+}
 
 
 
