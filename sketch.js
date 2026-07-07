@@ -297,11 +297,11 @@ let foundFishMessageActive = false;
 let foundFishMessageTimer = 0;
 let foundFishMessageDuration = 240
 const fishSpawns = [
-  { x: 224,  y: 1867 },
-  { x: 989,  y: 1517 },
-  { x: 1033,  y: 2037 },
-  { x: 714, y: 836 },
-  { x: 254,  y: 1698 }
+  { x: 243,  y: 1821 },
+  { x: 854,  y: 1203 },
+  { x: 203,  y: 1586 },
+  { x: 721, y: 752 },
+  { x: 263,  y: 1285 }
 ];
 
 // Stars score
