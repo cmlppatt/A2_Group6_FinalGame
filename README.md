@@ -39,13 +39,12 @@ After the showcase, we identified two additional improvements that would further
 | `assets/images/warning_octo.png`            | Warning and tutorial assets - ChatGPT.com              [7] |
 | `assets/images/tutorial_box.png`            | Warning and tutorial assets - ChatGPT.com              [7] |
 | `assets/images/box_key.png`                 | Box key image - ChatGPT.com                            [8] |
-| `assets/images/map.png`                     | TBD                                                    [-] |
-| `assets/images/fish.png`                    | TBD                                                    [-] |
-| `assets/images/checkmark.png`               | TBD                                                    [-] |
-| `assets/images/lock.png`                    | TBD                                                    [-] |
+| `assets/images/map.png`                     | Iterated game assets - ChatGPT.com                     [11]|
+| `assets/images/fish.png`                    | Fish sprite sheet - ChatGPT.com                        [9] |
+| `assets/images/checkmark.png`               | Iterated game assets - ChatGPT.com                     [11]|
+| `assets/images/lock.png`                    | Iterated game assets - ChatGPT.com                     [11]|
+| `assets/images/box .png`                    | Box asset - ChatGPT.com                                [12]|
 | `assets/sounds/stomp.mp3`                   | TBD                                                    [-] |
-| `assets/images/fish.png`                    | TBD                                                    [-] |
-| `assets/images/box .png`                    | TBD                                                    [-] |
 | `assets/sounds/background_music.mp3`        | TBD                                                    [-] |
 | `assets/sounds/collect_fish.mp3`            | TBD                                                    [-] |
 | `assets/sounds/ouch.mp3`                    | TBD                                                    [-] |
@@ -79,6 +78,22 @@ After the showcase, we identified two additional improvements that would further
 
 [8]
 2026. Check out this chat. ChatGPT. Retrieved July 7, 2026 from https://chatgpt.com/share/6a4c3530-ff80-83ea-8016-5245a49404c3
+
+[9]
+2026. Check out this chat. ChatGPT. Retrieved July 7, 2026 from https://chatgpt.com/share/6a4d2a8e-3b80-83ea-9e1e-42f38b3ff40d
+
+[10]
+2026. Check out this chat. ChatGPT. Retrieved July 7, 2026 from https://chatgpt.com/share/6a4d2a4f-811c-83ea-b371-9b468e1be632
+
+[11]
+2026. Check out this chat. ChatGPT. Retrieved July 7, 2026 from https://chatgpt.com/share/6a4d2a01-fa68-83ea-a0d1-a8b3755555b9?fbclid=PARlRTSAS6CeRwZG9mAmV4dG4DYWVtAjEwAHNydGMGYXBwX2lkDzEyNDAyNDU3NDI4NzQxNAABp1dTKxhlNb_zbFoWwJNIeJyuHMhG3xqLByyhrMc1Unz1-spbgXtD02aGA9SN_aem_-_ATcUBkSPnsy1jTo95fxQ 
+
+[12]
+2026. Check out this chat. ChatGPT. Retrieved July 7, 2026 from https://chatgpt.com/share/6a4c3530-ff80-83ea-8016-5245a49404c3
+‌
+‌
+‌
+‌
 ‌
 ‌
 
