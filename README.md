@@ -38,6 +38,7 @@ After the showcase, we identified two additional improvements that would further
 | `assets/images/win_screen.png`              | Screens, spike and penguin images - ChatGPT.com        [6] |
 | `assets/images/warning_octo.png`            | Warning and tutorial assets - ChatGPT.com              [7] |
 | `assets/images/tutorial_box.png`            | Warning and tutorial assets - ChatGPT.com              [7] |
+| `assets/images/box_key.png`                 | Box key image - ChatGPT.com                            [8] |
 | `assets/images/map.png`                     | TBD                                                    [-] |
 | `assets/images/fish.png`                    | TBD                                                    [-] |
 | `assets/images/checkmark.png`               | TBD                                                    [-] |
@@ -75,5 +76,9 @@ After the showcase, we identified two additional improvements that would further
 
 [7]
 2026. Check out this chat. ChatGPT. Retrieved July 6, 2026 from https://chatgpt.com/share/6a4c1c98-d984-83ea-871e-bac209f905e4
+
+[8]
+2026. Check out this chat. ChatGPT. Retrieved July 7, 2026 from https://chatgpt.com/share/6a4c3530-ff80-83ea-8016-5245a49404c3
+‌
 ‌
 
