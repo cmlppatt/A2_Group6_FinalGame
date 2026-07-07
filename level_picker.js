@@ -95,6 +95,15 @@ function drawLevelCircle(cx, cy, radius, unlocked, index) {
     noStroke();
     image(lock_icon, cx - 40 + shakeOffset - 25, cy - 40, 180, 140);
   }
+
+  // --- CHECKMARK FOR COMPLETED LEVELS ---
+  let levelKey = "level" + (index + 1);
+  if (bestStars[levelKey] >= 1)  {
+      // Draw checkmark slightly to the right of the circle
+      let checkX = cx + radius - 42;
+      let checkY = cy - radius + 25;
+      image(check_icon, checkX, checkY, 70, 70);
+  }
 }
 
 function drawInfoPanel(index) {
@@ -118,9 +127,36 @@ function drawInfoPanel(index) {
     textSize(16);
     text("Level " + (index+1), centerX, y + 110);
 
-    textSize(36);
-    text(panel.starScore, centerX, y + 170);
+    // --- DRAW STARS ---
+    let startX = x + 108;     // horizontal starting point
+    let starY  = y + 130;     // vertical base position
+    let starW  = 120;
+    let starH  = 120;     
+    const drawOrder = [0, 2, 1];
 
+    for (let i = 0; i < 3; i++) {
+        let starIndex = drawOrder[i];   // remap logical star index
+
+        let sx = startX + i * 82;
+        let yOffset = (i === 1) ? -10 : 0; // middle star visually higher
+
+        if (starIndex < bestStars["level" + (index + 1)]) {
+            image(starFilledImg, sx, starY + yOffset, starW, starH);
+        } else {
+            image(starOutlineImg, sx, starY + yOffset, starW, starH);
+        }
+    }
+
+
+    // --- DRAW FASTEST TIME ---
+    let key = "level" + (index + 1);
+    let fastest = fastestTimes[key];
+    let fastestText = (fastest === null)
+      ? "--:--"
+      : floor(fastest / 60) + ":" + nf(fastest % 60, 2);
+
+    // store into panel so your existing text() calls work
+    panel.recordTime = fastestText;
     textSize(20);
     text("Fastest Descent:", centerX, y + 260);
     textSize(36);
@@ -140,7 +176,6 @@ function drawInfoPanel(index) {
       cursor(HAND);
     }
 }
-
 
 function handleLevelPickerClick() {
   let cx = [570, 565, 531];
@@ -187,6 +222,7 @@ function handleLevelPickerClick() {
 function startLevel(index) {
     currentLevel = index + 1;   // 0→1, 1→2, 2→3
     if (index === 0) {
+        randomizeFishPosition();
         startLevel1();
     } else if (index === 1) {
         placeholderLevel(2);

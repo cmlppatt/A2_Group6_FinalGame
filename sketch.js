@@ -4,7 +4,7 @@
 // ============================================================
 
 // Screen manager
-let gameState = "level_picker"; 
+let gameState = "win"; 
 let startBg;
 let winBg;
 let lossBg;
@@ -57,7 +57,7 @@ const SPRITES = {
     frameHeight: 152,
     numFrames: 4,
     animSpeed: 7,
-    scale: 0.8,
+    scale: 0.65,
 
     cropLeft:  [0, 10, 20, 20],
     cropRight: [25, 20, 10, 5],
@@ -81,30 +81,44 @@ const SPRITES = {
 
   left: {
     img: null,
-    frameWidth: 152,
-    frameHeight: 137,
+    frameWidth: 327,
+    frameHeight: 254,
     numFrames: 4,
     animSpeed: 9,
-    scale: 0.8,
+    scale: 0.37,
 
-    cropLeft:  [0, 15, 20, 30],
-    cropRight: [30, 20, 10, 5],
+    cropLeft:  [0, 0, 70, 110],
+    cropRight: [90, 30, 0, 0],
     cropTop:   [0, 0, 0, 0],
     cropBottom:[0, 0, 0, 0]
   },
 
   right: {
     img: null,
-    frameWidth: 152,
-    frameHeight: 136,
-    numFrames: 4,
+    frameWidth: 332,
+    frameHeight: 263,
+    numFrames: 5, // make 4
     animSpeed: 7,
-    scale: 0.8,
+    scale: 0.37,
 
-    cropLeft:  [0, 15, 20, 30],
-    cropRight: [30, 20, 10, 5],
+    cropLeft:  [0, 0, 0, 0],
+    cropRight: [0, 0, 0, 0],
     cropTop:   [0, 0, 0, 0],
     cropBottom:[0, 0, 0, 0]
+  },
+
+  down: {
+    img: null,
+    frameWidth: 380,
+    frameHeight: 241,
+    numFrames: 6,
+    animSpeed: 7,
+    scale: 0.38,
+
+    cropLeft:  [130, 85, 25, 0, 0, 0],
+    cropRight: [0, 0, 0, 25, 65, 85],
+    cropTop:   [0, 0, 0, 0, 0, 0],
+    cropBottom:[0, 0, 0, 0, 0, 0]
   },
 
   stomp: {
@@ -148,10 +162,10 @@ let player = {
 };
 
 const PENGUIN_HITBOX = {
-  w: 50,
-  h: 60,
-  offsetX: -25,
-  offsetY: -50   // because the sprite is now anchored at the feet
+  w: 30,
+  h: 40,
+  offsetX: -15,
+  offsetY: -35   // because the sprite is now anchored at the feet
 };
 
 let DEBUG_PENGUIN_HITBOX = false; // remove after debugging
@@ -185,7 +199,7 @@ const STOMP_FRAME_DURATIONS = [10, 10, 10, 10, 70, 10];
 const STOMP_NUM_FRAMES = 6;
 let waveActive = false;
 let waveRadius = 100;
-let waveMaxRadius = 600; 
+let waveMaxRadius = 730; 
 let waveGrowth = 25;
 let waveDelay = 0;
 let waveDelayActive = false;
@@ -198,13 +212,13 @@ let stompOffsetX = -5;
 let stompOffsetY = 0;
 
 // ROCKY SPIKES
-const SPIKE_DRAW_W = 90;
-const SPIKE_DRAW_H = 90;
+const SPIKE_DRAW_W = 60;
+const SPIKE_DRAW_H = 60;
 const SPIKE_HITBOXES = [
-  { w: 75, h: 75, offsetX: 7, offsetY: 10 },  // small spike
-  { w: 85, h: 80, offsetX: 3, offsetY: 5 },  // mid spike
-  { w: 85, h: 85, offsetX: 2, offsetY: 0 },  // tall spike
-  { w: 85, h: 70, offsetX: 0, offsetY: 10 }   // double spike
+  { w: 40, h: 50, offsetX: 7, offsetY: 5 },  // small spike
+  { w: 45, h: 50, offsetX: 10, offsetY: 5 },  // mid spike
+  { w: 55, h: 55, offsetX: 2, offsetY: 0 },  // tall spike
+  { w: 57, h: 60, offsetX: 0, offsetY: 0 }   // double spike
 ];
 let spikeImages = [];
 let spikes = [];
@@ -222,6 +236,7 @@ let tutorialBox;
 let warningOutline;
 let maskBuffer;
 let avalancheBuffer;
+let boxKey; //// ************************* NEWWWWW LINEEEE ***************** /////
 let tutorialSteps = [
   {
     text: "AVALANCHE\nWARNING\nIN {time} !",
@@ -230,46 +245,75 @@ let tutorialSteps = [
     size: 42,
     // box
     boxFill: tutorialBox,
-    yOffset: -20,
     delay: 60
   },
   {
-    text: "The blizzard is picking up,\n we need to get down from the mountain.",
+    text: " ",
     //text
-    fill: [255, 145, 48],
-    size: 36,
-    // box
-    boxFill: tutorialBox,
-    yOffset: -20,
-    delay: 20
-  },
-  {
-    text: "Use A, W, S, D to move around.",
-    //text
-    fill: [255, 145, 48],
-    size: 36,
-    // box
-    boxFill: tutorialBox,
-    yOffset: -5,
-    delay: 20
-  },
-  {
-    text: "Really can't see much eh? Try pressing space!\n But careful, stomping causes vibrations, which makes the \navalanche come 45 seconds faster!",
-    //text
-    fill: [255, 145, 48],
+    fill: [140, 180, 230],
     size: 28,
     // box
     boxFill: tutorialBox,
-    yOffset: -20,
     delay: 20
+  },
+  {
+    text: "Use A, W, S, D\nto move around.",
+    //text
+    fill: [140, 180, 230],
+    size: 28,
+    // box
+    boxFill: tutorialBox,
+    delay: 20
+  },
+  {
+    text: " ",
+    //text
+    fill: [140, 180, 230],
+    size: 24,
+    // box
+    boxFill: tutorialBox,
+    delay: 450
   }
 ];
+
+// Fish item
+let fishImg;
+let fish = {
+  x: 0,
+  y: 0,
+  w: 35,
+  h: 25,
+  collected: false
+};
+let fishIconOutline;   // when NOT collected
+let fishIconFilled;    // when collected
+let needFishMessageActive = false;
+let needFishMessageTimer = 0;
+let needFishMessageDuration = 120; // 2 seconds at 60fps
+const fishSpawns = [
+  { x: 224,  y: 1867 },
+  { x: 989,  y: 1517 },
+  { x: 1033,  y: 2037 },
+  { x: 714, y: 836 },
+  { x: 254,  y: 1698 }
+];
+
+// Stars score
+let starOutlineImg;
+let starFilledImg;
+let starsEarned = 0; 
+let bestStars = { //highest score tracker
+  level1: 0,
+  level2: 0,
+  level3: 0
+};
 
 function preload() {
   SPRITES.up.img = loadImage("assets/images/penguin_front.png");
   SPRITES.start_penguin.img = loadImage("assets/images/penguin_front.png");
-  SPRITES.left.img = loadImage("assets/images/penguin_left.png");
-  SPRITES.right.img = loadImage("assets/images/penguin_right.png");
+  SPRITES.left.img = loadImage("assets/images/a_key_penguin.png");
+  SPRITES.right.img = loadImage("assets/images/d_key_penguin.png");
+  SPRITES.down.img = loadImage("assets/images/s_key_penguin.png");
   SPRITES.stomp.img = loadImage("assets/images/penguin_stomp.png");
   SPRITES.penguin_avalanche.img = loadImage("assets/images/penguin_avalanche.png");
   startBg = loadImage("assets/images/start_screen.png");
@@ -281,22 +325,37 @@ function preload() {
   check_icon = loadImage("assets/images/check_icon.png");
   info_box = loadImage("assets/images/level_info_box.png");
 
+  // Fishy stuff
+  fishImg = loadImage("assets/images/test_fish.png");
+  fishIconOutline = loadImage("assets/images/fish_outline.png"); 
+  fishIconFilled  = loadImage("assets/images/fish_item.png");
+
+  // Star score
+  starOutlineImg = loadImage("assets/images/star_outline.png");
+  starFilledImg  = loadImage("assets/images/golden_star.png");
+
+
+  avalanche_test = loadImage("assets/images/avalanche_test.png");
 
   start_penguin = loadImage("assets/images/start_penguin.png");
   gameFont = loadFont("assets/fonts/ZenDots-Regular.ttf");
   tutorialBox = loadImage("assets/images/tutorial_box.png");
   warningOutline = loadImage("assets/images/warning_octo.png");
+  boxKey = loadImage("assets/images/box_key.png");
 
   spikeImages[0] = loadImage("assets/images/spike_small.png");
   spikeImages[1] = loadImage("assets/images/spike_mid.png");
   spikeImages[2] = loadImage("assets/images/spike_tall.png");
   spikeImages[3] = loadImage("assets/images/spike_double.png");
-  bgImg = loadImage("assets/images/background.png", () => {
+  bgImg = loadImage("assets/images/tutorial_background.png", () => {
     WORLD_W = bgImg.width;
     WORLD_H = bgImg.height;
     bgScale = Math.max(VIEW_W / WORLD_W, VIEW_H / WORLD_H);
     WORLD_W_SCALED = WORLD_W * bgScale;
     WORLD_H_SCALED = WORLD_H * bgScale;
+    WORLD_TOP_LIMIT = WORLD_H_SCALED / 2 - 300;
+    fish.x = WORLD_W_SCALED/2 - 230;
+    fish.y = WORLD_H_SCALED/2 + 740;
 
     // WALL 1 — centered diagonal
     walls.push({
@@ -318,71 +377,201 @@ function preload() {
     player.y = WORLD_H_SCALED + 0;
 
     spikes = [
-      // Left bottom cluster
-      { x: WORLD_W_SCALED/2 - 550, y: WORLD_H_SCALED/2 + 250, variant: 3 },
-      { x: WORLD_W_SCALED/2 - 350, y: WORLD_H_SCALED/2 + 75, variant: 2 },
-      { x: WORLD_W_SCALED/2 - 300, y: WORLD_H_SCALED/2 + 130, variant: 1 },
-      { x: WORLD_W_SCALED/2 - 300, y: WORLD_H_SCALED/2 + 200, variant: 0 },
-      { x: WORLD_W_SCALED/2 - 350, y: WORLD_H_SCALED/2 + 270, variant: 1 },
-
-      // Middle bottom cluster
-      { x: WORLD_W_SCALED/2 - 50, y: WORLD_H_SCALED/2 + 200, variant: 0 },
-      { x: WORLD_W_SCALED/2 + 15, y: WORLD_H_SCALED/2 + 200, variant: 2 },
-      { x: WORLD_W_SCALED/2 + 85, y: WORLD_H_SCALED/2 + 240, variant: 3 },
-
-      // Right bottom cluster
-      { x: WORLD_W_SCALED/2 + 360, y: WORLD_H_SCALED/2 + 270, variant: 1 },
-      { x: WORLD_W_SCALED/2 + 450, y: WORLD_H_SCALED/2 + 265, variant: 0 },
-      { x: WORLD_W_SCALED/2 + 300, y: WORLD_H_SCALED/2 + 300, variant: 2 },
-      { x: WORLD_W_SCALED/2 + 390, y: WORLD_H_SCALED/2 + 300, variant: 1 },
-      { x: WORLD_W_SCALED/2 + 480, y: WORLD_H_SCALED/2 + 305, variant: 3 },
-      
-      // Middle high-bottom cluster
-      { x: WORLD_W_SCALED/2 - 110, y: WORLD_H_SCALED/2 - 10, variant: 3 },
-      { x: WORLD_W_SCALED/2 - 50, y: WORLD_H_SCALED/2 + 20, variant: 1 },
-      { x: WORLD_W_SCALED/2 + 25, y: WORLD_H_SCALED/2 + 20, variant: 1 },
-      { x: WORLD_W_SCALED/2 + 85, y: WORLD_H_SCALED/2 + 50, variant: 0 },
-      
-      // Left high-bottom cluster
-      { x: WORLD_W_SCALED/2 - 450, y: WORLD_H_SCALED/2 - 90, variant: 0 },
-      { x: WORLD_W_SCALED/2 - 370, y: WORLD_H_SCALED/2 - 90, variant: 2 },
-      { x: WORLD_W_SCALED/2 - 280, y: WORLD_H_SCALED/2 - 120, variant: 3 },
-      { x: WORLD_W_SCALED/2 - 500, y: WORLD_H_SCALED/2 - 50, variant: 0 },
-
-      // Right high-bottom cluster
-      { x: WORLD_W_SCALED/2 + 220, y: WORLD_H_SCALED/2 + 60, variant: 0 },
-      { x: WORLD_W_SCALED/2 + 250, y: WORLD_H_SCALED/2 + 100, variant: 2 },
-      { x: WORLD_W_SCALED/2 + 240, y: WORLD_H_SCALED/2 + 190, variant: 3 },
-      { x: WORLD_W_SCALED/2 + 280, y: WORLD_H_SCALED/2 + 230, variant: 1 },
-      
-      // Middle great rock wall
-       { x: WORLD_W_SCALED/2 - 200, y: WORLD_H_SCALED/2 - 170, variant: 0 },
-       { x: WORLD_W_SCALED/2 - 140, y: WORLD_H_SCALED/2 - 170, variant: 2 },
-       { x: WORLD_W_SCALED/2 - 80, y: WORLD_H_SCALED/2 - 170, variant: 0 },
-       { x: WORLD_W_SCALED/2 - 20, y: WORLD_H_SCALED/2 - 170, variant: 2 },
-       { x: WORLD_W_SCALED/2 + 40, y: WORLD_H_SCALED/2 - 170, variant: 0 },
-       { x: WORLD_W_SCALED/2 + 100, y: WORLD_H_SCALED/2 - 170, variant: 2 },
-          //One extra to the left:
-       { x: WORLD_W_SCALED/2 - 350, y: WORLD_H_SCALED/2 - 240, variant: 3 },
-
-      // Top middle cluster
-         // Back row
-       { x: WORLD_W_SCALED/2 - 20, y: WORLD_H_SCALED/2 - 370, variant: 0 },
-       { x: WORLD_W_SCALED/2 - 80, y: WORLD_H_SCALED/2 - 350, variant: 0 },
-       { x: WORLD_W_SCALED/2 + 60, y: WORLD_H_SCALED/2 - 350, variant: 3 },
-
-       { x: WORLD_W_SCALED/2 - 180, y: WORLD_H_SCALED/2 - 330, variant: 1 },
-       { x: WORLD_W_SCALED/2 - 120, y: WORLD_H_SCALED/2 - 330, variant: 2 },
-       { x: WORLD_W_SCALED/2 - 60, y: WORLD_H_SCALED/2 - 330, variant: 1 },
-       { x: WORLD_W_SCALED/2 - 0, y: WORLD_H_SCALED/2 - 330, variant: 2 },
-       { x: WORLD_W_SCALED/2 + 60, y: WORLD_H_SCALED/2 - 330, variant: 1 },
-       { x: WORLD_W_SCALED/2 + 120, y: WORLD_H_SCALED/2 - 330, variant: 2 },
-       
-      // Very top
-      { x: WORLD_W_SCALED/2 - 180, y: WORLD_H_SCALED/2 - 520, variant: 3 },
-      { x: WORLD_W_SCALED/2 - 40, y: WORLD_H_SCALED/2 - 480, variant: 2 },
-      { x: WORLD_W_SCALED/2 + 50, y: WORLD_H_SCALED/2 - 480, variant: 0 },
-      { x: WORLD_W_SCALED/2 - 250, y: WORLD_H_SCALED/2 - 480, variant: 1 },
+      { x: 657, y: 604, variant: 0 },
+      { x: 637, y: 604, variant: 0 },
+      { x: 621, y: 607, variant: 0 },
+      { x: 526, y: 615, variant: 0 },
+      { x: 510, y: 623, variant: 0 },
+      { x: 483, y: 642, variant: 0 },
+      { x: 469, y: 681, variant: 1 },
+      { x: 461, y: 727, variant: 1 },
+      { x: 447, y: 754, variant: 1 },
+      { x: 437, y: 787, variant: 1 },
+      { x: 430, y: 809, variant: 1 },
+      { x: 416, y: 853, variant: 1 },
+      { x: 406, y: 877, variant: 3 },
+      { x: 394, y: 918, variant: 3 },
+      { x: 391, y: 946, variant: 3 },
+      { x: 378, y: 984, variant: 3 },
+      { x: 365, y: 1022, variant: 3 },
+      { x: 350, y: 1066, variant: 3 },
+      { x: 331, y: 1134, variant: 1 },
+      { x: 323, y: 1178, variant: 1 },
+      { x: 317, y: 1216, variant: 1 },
+      { x: 312, y: 1247, variant: 1 },
+      { x: 301, y: 1290, variant: 1 },
+      { x: 301, y: 1290, variant: 2 },
+      { x: 288, y: 1334, variant: 2 },
+      { x: 282, y: 1364, variant: 2 },
+      { x: 276, y: 1389, variant: 2 },
+      { x: 267, y: 1421, variant: 2 },
+      { x: 264, y: 1457, variant: 0 },
+      { x: 273, y: 1493, variant: 0 },
+      { x: 316, y: 1553, variant: 0 },
+      { x: 352, y: 1580, variant: 0 },
+      { x: 303, y: 1520, variant: 0 },
+      { x: 332, y: 1558, variant: 0 },
+      { x: 363, y: 1596, variant: 0 },
+      { x: 568, y: 1145, variant: 0 },
+      { x: 551, y: 1175, variant: 0 },
+      { x: 525, y: 1241, variant: 0 },
+      { x: 515, y: 1298, variant: 0 },
+      { x: 499, y: 1356, variant: 0 },
+      { x: 489, y: 1389, variant: 1 },
+      { x: 479, y: 1421, variant: 1 },
+      { x: 477, y: 1443, variant: 1 },
+      { x: 464, y: 1482, variant: 1 },
+      { x: 455, y: 1503, variant: 1 },
+      { x: 439, y: 1539, variant: 1 },
+      { x: 434, y: 1558, variant: 1 },
+      { x: 413, y: 1591, variant: 1 },
+      { x: 398, y: 1605, variant: 1 },
+      { x: 788, y: 1126, variant: 3 },
+      { x: 765, y: 1126, variant: 3 },
+      { x: 732, y: 1126, variant: 3 },
+      { x: 715, y: 1129, variant: 2 },
+      { x: 692, y: 1129, variant: 2 },
+      { x: 676, y: 1134, variant: 2 },
+      { x: 653, y: 1134, variant: 2 },
+      { x: 612, y: 1134, variant: 2 },
+      { x: 811, y: 1173, variant: 0 },
+      { x: 799, y: 1211, variant: 0 },
+      { x: 782, y: 1230, variant: 0 },
+      { x: 775, y: 1266, variant: 0 },
+      { x: 761, y: 1309, variant: 3 },
+      { x: 745, y: 1329, variant: 3 },
+      { x: 739, y: 1367, variant: 1 },
+      { x: 728, y: 1416, variant: 1 },
+      { x: 689, y: 1359, variant: 0 },
+      { x: 641, y: 1255, variant: 0 },
+      { x: 660, y: 1293, variant: 0 },
+      { x: 672, y: 1342, variant: 0 },
+      { x: 709, y: 1389, variant: 0 },
+      { x: 743, y: 1435, variant: 0 },
+      { x: 625, y: 1266, variant: 0 },
+      { x: 614, y: 1285, variant: 0 },
+      { x: 601, y: 1323, variant: 0 },
+      { x: 599, y: 1372, variant: 0 },
+      { x: 598, y: 1419, variant: 0 },
+      { x: 607, y: 1460, variant: 0 },
+      { x: 596, y: 1490, variant: 0 },
+      { x: 559, y: 1498, variant: 0 },
+      { x: 546, y: 1512, variant: 0 },
+      { x: 540, y: 1547, variant: 0 },
+      { x: 535, y: 1572, variant: 0 },
+      { x: 529, y: 1599, variant: 0 },
+      { x: 519, y: 1626, variant: 0 },
+      { x: 505, y: 1629, variant: 0 },
+      { x: 489, y: 1643, variant: 0 },
+      { x: 467, y: 1648, variant: 0 },
+      { x: 447, y: 1676, variant: 0 },
+      { x: 412, y: 1673, variant: 0 },
+      { x: 398, y: 1667, variant: 0 },
+      { x: 366, y: 1654, variant: 0 },
+      { x: 341, y: 1651, variant: 0 },
+      { x: 322, y: 1651, variant: 0 },
+      { x: 297, y: 1632, variant: 0 },
+      { x: 257, y: 1621, variant: 0 },
+      { x: 238, y: 1596, variant: 0 },
+      { x: 216, y: 1599, variant: 0 },
+      { x: 207, y: 1643, variant: 0 },
+      { x: 199, y: 1706, variant: 0 },
+      { x: 200, y: 1749, variant: 1 },
+      { x: 229, y: 1788, variant: 1 },
+      { x: 265, y: 1812, variant: 1 },
+      { x: 313, y: 1826, variant: 1 },
+      { x: 371, y: 1840, variant: 1 },
+      { x: 422, y: 1853, variant: 3 },
+      { x: 476, y: 1859, variant: 3 },
+      { x: 529, y: 1859, variant: 3 },
+      { x: 572, y: 1832, variant: 2 },
+      { x: 609, y: 1799, variant: 2 },
+      { x: 729, y: 1700, variant: 2 },
+      { x: 703, y: 1717, variant: 2 },
+      { x: 679, y: 1736, variant: 2 },
+      { x: 659, y: 1782, variant: 2 },
+      { x: 624, y: 1815, variant: 2 },
+      { x: 587, y: 1837, variant: 2 },
+      { x: 570, y: 1859, variant: 2 },
+      { x: 904, y: 1441, variant: 0 },
+      { x: 896, y: 1473, variant: 0 },
+      { x: 886, y: 1525, variant: 0 },
+      { x: 888, y: 1564, variant: 0 },
+      { x: 894, y: 1602, variant: 0 },
+      { x: 886, y: 1648, variant: 0 },
+      { x: 1008, y: 1452, variant: 0 },
+      { x: 991, y: 1449, variant: 0 },
+      { x: 959, y: 1446, variant: 0 },
+      { x: 938, y: 1443, variant: 0 },
+      { x: 1035, y: 1733, variant: 0 },
+      { x: 1049, y: 1785, variant: 0 },
+      { x: 1060, y: 1851, variant: 0 },
+      { x: 1073, y: 1897, variant: 0 },
+      { x: 1085, y: 1944, variant: 0 },
+      { x: 1100, y: 1982, variant: 0 },
+      { x: 1114, y: 2045, variant: 0 },
+      { x: 1124, y: 2086, variant: 0 },
+      { x: 848, y: 1766, variant: 0 },
+      { x: 877, y: 1815, variant: 0 },
+      { x: 903, y: 1864, variant: 0 },
+      { x: 720, y: 1894, variant: 0 },
+      { x: 766, y: 1905, variant: 0 },
+      { x: 804, y: 1919, variant: 0 },
+      { x: 194, y: 1985, variant: 0 },
+      { x: 264, y: 1990, variant: 0 },
+      { x: 165, y: 1837, variant: 0 },
+      { x: 145, y: 1870, variant: 0 },
+      { x: 121, y: 1919, variant: 0 },
+      { x: 113, y: 1998, variant: 0 },
+      { x: 106, y: 2047, variant: 0 },
+      { x: 680, y: 1569, variant: 0 },
+      { x: 555, y: 1736, variant: 0 },
+      { x: 606, y: 774, variant: 0 },
+      { x: 586, y: 798, variant: 0 },
+      { x: 559, y: 809, variant: 0 },
+      { x: 540, y: 836, variant: 0 },
+      { x: 525, y: 836, variant: 0 },
+      { x: 518, y: 899, variant: 0 },
+      { x: 500, y: 949, variant: 0 },
+      { x: 490, y: 979, variant: 0 },
+      { x: 475, y: 1022, variant: 0 },
+      { x: 462, y: 1072, variant: 0 },
+      { x: 452, y: 1107, variant: 0 },
+      { x: 438, y: 1148, variant: 0 },
+      { x: 428, y: 1186, variant: 0 },
+      { x: 414, y: 1236, variant: 0 },
+      { x: 400, y: 1298, variant: 0 },
+      { x: 395, y: 1337, variant: 0 },
+      { x: 485, y: 1003, variant: 0 },
+      { x: 386, y: 1413, variant: 0 },
+      { x: 480, y: 1348, variant: 0 },
+      { x: 816, y: 918, variant: 0 },
+      { x: 797, y: 918, variant: 0 },
+      { x: 772, y: 886, variant: 0 },
+      { x: 756, y: 856, variant: 0 },
+      { x: 746, y: 812, variant: 0 },
+      { x: 737, y: 754, variant: 0 },
+      { x: 720, y: 711, variant: 0 },
+      { x: 734, y: 744, variant: 0 },
+      { x: 743, y: 785, variant: 0 },
+      { x: 760, y: 826, variant: 0 },
+      { x: 772, y: 861, variant: 0 },
+      { x: 783, y: 894, variant: 0 },
+      { x: 818, y: 927, variant: 0 },
+      { x: 711, y: 722, variant: 2 },
+      { x: 702, y: 741, variant: 2 },
+      { x: 688, y: 763, variant: 2 },
+      { x: 673, y: 785, variant: 2 },
+      { x: 654, y: 828, variant: 2 },
+      { x: 651, y: 847, variant: 2 },
+      { x: 628, y: 902, variant: 3 },
+      { x: 729, y: 987, variant: 3 },
+      { x: 691, y: 1006, variant: 3 },
+      { x: 661, y: 1014, variant: 3 },
+      { x: 569, y: 995, variant: 0 },
+      { x: 465, y: 2020, variant: 0 },
+      { x: 540, y: 1900, variant: 0 },
+      { x: 604, y: 2005, variant: 0 },
     ];
   });
 }
@@ -408,15 +597,30 @@ function drawSpikes() {
 
 function drawSpikeHitboxes() {
   if (!DEBUG_SPIKE_HITBOXES) return;
+
   push();
   noFill();
+
   for (let s of spikes) {
     let hb = SPIKE_HITBOXES[s.variant];
     if (!hb) continue;
-    let hx = s.x + hb.offsetX;
-    let hy = s.y + hb.offsetY;
-    rect(hx, hy, hb.w, hb.h);
+
+    // BLUE = full spike image border
+    stroke(0, 140, 255);
+    strokeWeight(3 / (camZoom * bgScale));
+    rect(s.x, s.y, SPIKE_DRAW_W, SPIKE_DRAW_H);
+
+    // RED = actual collision hitbox
+    stroke(255, 0, 0);
+    strokeWeight(3 / (camZoom * bgScale));
+    rect(
+      s.x + hb.offsetX,
+      s.y + hb.offsetY,
+      hb.w,
+      hb.h
+    );
   }
+
   pop();
 }
 
@@ -428,13 +632,21 @@ function drawPenguinHitbox() {
   let ox = PENGUIN_HITBOX.offsetX;
   let oy = PENGUIN_HITBOX.offsetY;
 
-  // world → screen
-  let screenX = (player.x - camX) * camZoom * bgScale + ox;
-  let screenY = (player.y - camY) * camZoom * bgScale + oy;
+  let scale = camZoom * bgScale;
+
+  let screenX = (player.x + ox - camX) * scale;
+  let screenY = (player.y + oy - camY) * scale;
 
   push();
   noFill();
-  rect(screenX, screenY, hw, hh);
+  stroke(0, 255, 0);
+  strokeWeight(3);
+  rect(
+    screenX,
+    screenY,
+    hw * scale,
+    hh * scale
+  );
   pop();
 }
 
@@ -545,6 +757,33 @@ function drawTutorialButton(label, x, y, w, h, pressedFlag) {
   return { hover, clicked };
 }
 
+function drawFish() {
+  if (fish.collected) return;
+
+  image(fishImg, fish.x, fish.y, fish.w, fish.h);
+}
+
+function drawFishIconUI() {
+  let x = 40;   // screen position
+  let y = 40;
+
+  // Set EXACT width and height here
+  let iconW = 80;   // width
+  let iconH = 50;   // height
+
+  if (fish.collected) {
+    image(fishIconFilled, x, y, iconW, iconH);
+  } else {
+    image(fishIconOutline, x, y, iconW, iconH);
+  }
+}
+
+function randomizeFishPosition() {
+  let spot = random(fishSpawns);   // p5.js random() picks a random element
+  fish.x = spot.x;
+  fish.y = spot.y;
+}
+
 function draw() {
   // START SCREEN
   if (gameState === "start") {
@@ -586,6 +825,21 @@ function draw() {
   animateSprite();
   updateCamera();
   updateStompAnimation();
+  checkFishCollision(); 
+
+  // --- BLOCK TOP EXIT IF FISH NOT COLLECTED ---
+  if (!fish.collected) {
+    let penguinScreenBottom = (player.y - camY) * camZoom * bgScale;
+
+    if (player.y < WORLD_TOP_LIMIT + 40) {
+      // stop movement
+      player.y = WORLD_TOP_LIMIT + 40;
+
+      // trigger popup message
+      needFishMessageActive = true;
+      needFishMessageTimer = needFishMessageDuration;
+    }
+  }
 
   // -------------------------
   // WIN CONDITION
@@ -593,27 +847,37 @@ function draw() {
   let penguinScreenBottom =
     (player.y - camY) * camZoom * bgScale;
 
-  if (penguinScreenBottom < 0) {
-    let elapsed = floor((millis() - startTime) / 1000);
-    finalTime = elapsed;
+  if (player.y < WORLD_TOP_LIMIT && fish.collected) {
+      let elapsed = floor((millis() - startTime) / 1000);
+      finalTime = elapsed;
 
-    // update fastest time
-    let key = "level" + currentLevel;   // currentLevel = 1, 2, or 3
-    if (fastestTimes[key] === null || finalTime < fastestTimes[key]) {
-        fastestTimes[key] = finalTime;
-        fastestTimesIsNew[key] = true;
-    } else {
-        fastestTimesIsNew[key] = false;
-    }
+      // --- STAR SCORING ---
+      starsEarned = 0;
+      if (fish.collected) starsEarned++;
+      let timeLeft = totalTime - finalTime;
+      if (timeLeft >= 30) starsEarned++;
+      if (timeLeft >= 60) starsEarned++;
 
+      // highest score
+      let starKey = "level" + currentLevel;
+      if (starsEarned > bestStars[starKey]) {
+        bestStars[starKey] = starsEarned;
+      }
 
-    gameState = "win";
-    return;
+      // --- UPDATE FASTEST TIME ---
+      let key = "level" + currentLevel;
+      if (fastestTimes[key] === null || finalTime < fastestTimes[key]) {
+          fastestTimes[key] = finalTime;
+          fastestTimesIsNew[key] = true;
+      } else {
+          fastestTimesIsNew[key] = false;
+      }
+
+      tutorialActive = false;
+      postTutorialTimerActive = false;
   }
 
-  // -------------------------
   // WAVE DELAY + WAVE UPDATE
-  // -------------------------
   if (waveDelayActive) {
     waveDelay--;
     if (waveDelay <= 0) {
@@ -626,34 +890,27 @@ function draw() {
     updateWave();
   }
 
-  // -------------------------
   // DRAW WORLD
-  // -------------------------
   push();
   scale(camZoom * bgScale);
   translate(-camX, -camY);
   drawBackground();
   drawSpikes();
+  drawFish();
   drawSpikeHitboxes();
   pop();
 
-  // -------------------------
   // DRAW CHARACTER
-  // -------------------------
   drawCharacterOnScreen();
   drawPenguinHitbox();
 
   // Capture world frame for X-ray ring
   baseWorldFrame = get();
 
-  // -------------------------
   // BLIZZARD OVERLAY
-  // -------------------------
   drawBlizzardOverlay();
 
-  // -------------------------
   // X-RAY RING
-  // -------------------------
   if (waveActive) {
     ringMaskBuffer.clear();
     ringMaskBuffer.noStroke();
@@ -687,14 +944,13 @@ function draw() {
     noTint();
   }
 
-  // -------------------------
   // TIMER
-  // -------------------------
   drawTimer();
 
-  // -------------------------
+  // draw fish ui
+  drawFishIconUI();
+
   // TUTORIAL POST-DELAY
-  // -------------------------
   if (postTutorialTimerActive) {
     postTutorialTimer++;
 
@@ -707,11 +963,34 @@ function draw() {
     }
   }
 
-  // -------------------------
   // TUTORIAL OVERLAY
-  // -------------------------
   if (tutorialActive) {
-    drawTutorialOverlay();
+      drawTutorialOverlay();
+  }
+
+  // --- NEED FISH POPUP MESSAGE ---
+  if (needFishMessageActive) {
+      needFishMessageTimer--;
+      push();
+      imageMode(CENTER);
+
+      // same tutorial box image
+      image(tutorialBox, width/2, height/2, 730, 200);
+
+      // text
+      textAlign(CENTER, CENTER);
+      textFont(gameFont);
+      textSize(32);
+      stroke(10, 15, 54);
+      strokeWeight(8);
+      fill(247, 20, 43);
+
+      text("You need to find Fishy first !", width/2, height/2);
+      pop();
+
+      if (needFishMessageTimer <= 0) {
+        needFishMessageActive = false;
+      }
   }
 }
 
@@ -781,11 +1060,7 @@ function drawTutorialOverlay() {
     textAlign(LEFT, CENTER);
     let rightEdge = width/2 - 80;
     text(displayText, rightEdge - 10, height/2+10);
-  } else {
-    textAlign(CENTER, CENTER);
-    text(step.text, width/2, height/2 - 20);
-  }
-  if (tutorialIndex === 0) {
+
     drawOctagon(width/2 - 230, height/2 + 17, 95, 255);
     animateAvalanche();
     avalancheBuffer.clear();
@@ -796,6 +1071,130 @@ function drawTutorialOverlay() {
     avalancheImgMasked.mask(maskBuffer);
     image(avalancheImgMasked, width/2 - 335, height/2 - 80);
     image(warningOutline, width/2 - 330, height/2 - 80, 200, 200);
+  } 
+
+  else if (tutorialIndex === 1) {
+    textAlign(LEFT, TOP);
+    textSize(step.size);
+    stroke(10, 15, 54);
+    strokeWeight(8);
+
+    let leftX = width/2 - 150;
+    let baseY = height/2 - 40;
+    let lh = textAscent() + textDescent() + 10;
+
+    // Line 1 split
+    let before1    = "Hurry, find ";
+    let highlight1 = "Fishy";
+    let after1     = " and";
+
+    // Line 2
+    let line2      = "make your way down the";
+
+    // Line 3
+    let line3      = "mountain to shelter!";
+
+    // --- LINE 1 (before + highlight + after) ---
+    fill(step.fill[0], step.fill[1], step.fill[2]);
+    text(before1, leftX, baseY);
+
+    let beforeW = textWidth(before1);
+
+    fill(255); // white highlight
+    text(highlight1, leftX + beforeW, baseY);
+
+    let highlightW = textWidth(highlight1);
+
+    fill(step.fill[0], step.fill[1], step.fill[2]);
+    text(after1, leftX + beforeW + highlightW, baseY);
+
+    // --- LINE 2 ---
+    text(line2, leftX, baseY + lh);
+
+    // --- LINE 3 ---
+    text(line3, leftX, baseY + lh * 2);
+
+    image(fishImg, 270, height/2 - 30, 150, 100);
+  }
+
+  else if (tutorialIndex === 2) {
+    textAlign(LEFT, CENTER);
+    let rightEdge = width/2 - 80;
+    text(step.text, rightEdge + 20, height/2 + 10);
+
+    fill(10, 15, 54)
+    strokeWeight(2);
+    textFont(gameFont);
+    textSize(24);
+    textAlign(CENTER);
+
+    // W key
+    rect(width/2-238, height/2-48, 60, 60, 4)
+    image(boxKey, width/2-250, height/2-60, 70, 70);
+    text("W", width/2 - 215, height/2 - 28);
+
+    // S key
+    rect(width/2-238, height/2+32, 60, 60, 4)
+    image(boxKey, width/2-250, height/2+20, 70, 70);
+    text("S", width/2 - 215, height/2 + 52);
+
+    // A key
+    rect(width/2-318, height/2+32, 60, 60, 4)
+    image(boxKey, width/2-330, height/2+20, 70, 70);
+    text("A", width/2 - 295, height/2 + 52);
+
+    // D key
+    rect(width/2-158, height/2+32, 60, 60, 4)
+    image(boxKey, width/2-170, height/2+20, 70, 70);
+    text("D", width/2 - 135, height/2 + 52);
+  }
+
+  else if (tutorialIndex === 3) {
+    textAlign(LEFT, TOP);
+    textSize(step.size);
+    stroke(10, 15, 54);
+    strokeWeight(8);
+
+    // --- LEFT BOUND + Y POSITION CONTROL ---
+    let leftX = width/2 - 330;
+    let baseY = height/2 - 50; 
+    let lh = textAscent() + textDescent() + 10; // line height
+
+
+    // --- LINE 1 ---
+    fill(step.fill[0], step.fill[1], step.fill[2]);
+    text("Really can't see much... pressing space!", leftX, baseY);
+
+
+    // --- LINE 2 ---
+    text("But careful, vibrations makes the", leftX, baseY + lh);
+
+
+    // --- LINE 3 (with red highlight) ---
+    let before    = "avalanche come ";
+    let highlight = "45 seconds";
+    let after     = " faster!";
+
+    let line3Y = baseY + lh * 2;
+
+    // BEFORE
+    fill(step.fill[0], step.fill[1], step.fill[2]);
+    text(before, leftX, line3Y);
+
+    // RED HIGHLIGHT
+    let beforeW = textWidth(before);
+    fill(255, 0, 0);
+    text(highlight, leftX + beforeW, line3Y);
+
+    // AFTER
+    let highlightW = textWidth(highlight);
+    fill(step.fill[0], step.fill[1], step.fill[2]);
+    text(after, leftX + beforeW + highlightW, line3Y);
+  }
+
+  else {
+    textAlign(CENTER, CENTER);
+    text(step.text, width/2, height/2 + 10);
   }
 
   let btn = drawTutorialButton("OK", width/2 + 280, height*0.62, 100, 45, tutorialBtnPressed);
@@ -982,6 +1381,7 @@ function resetGame() {
   finalTime = null;
 
   totalTime = 150;   // reset timer
+  flashTimer = 0;
 
   tutorialActive = false;
   postTutorialTimerActive = false;
@@ -995,6 +1395,12 @@ function resetGame() {
   stompFrame = 0;
   waveActive = false;
   waveRadius = 0;
+
+  fish.collected = false;
+  randomizeFishPosition();
+  bestStars.level1 = 0;
+  bestStars.level2 = 0;
+  bestStars.level3 = 0;
 }
 
 function pointSide(px, py, x1, y1, x2, y2) {
@@ -1002,7 +1408,7 @@ function pointSide(px, py, x1, y1, x2, y2) {
 }
 
 function drawBackground() {
-  image(bgImg, -30, 0, WORLD_W_SCALED, WORLD_H_SCALED);
+  image(bgImg, 0, 0, WORLD_W_SCALED, WORLD_H_SCALED);
 }
 
 function updateCamera() {
@@ -1018,7 +1424,7 @@ function updateCamera() {
 
   // clamp camera to scaled world
   targetX = constrain(targetX, 0, (WORLD_W_SCALED - visibleW) - 30);
-  targetY = constrain(targetY, 0, WORLD_H_SCALED - visibleH);
+  targetY = constrain(targetY, WORLD_TOP_LIMIT, WORLD_H_SCALED - visibleH);
 
   camX = lerp(camX, targetX, CAM_SMOOTHING);
   camY = lerp(camY, targetY, CAM_SMOOTHING);
@@ -1089,9 +1495,10 @@ function drawSadEnding() {
 }
 
 function handleInput() {
-  if (tutorialActive) {
+  // Allow movement during tutorial delay
+  if (tutorialActive && tutorialDelay <= 0) {
     player.isMoving = false;
-    return;   // block all movement + stomp
+    return;   // freeze ONLY when the card is visible
   }
 
   if (stompAnimating) {
@@ -1120,6 +1527,12 @@ function handleInput() {
     player.direction = "right";
     player.isMoving = true;
   }
+  if (keyIsDown(83)) {           // S / down
+    newY += player.speed;
+    player.direction = "down";     // keep using the front-facing sprite for now (CATH WILL FIX)
+    player.isMoving = true;
+  }
+
   if (keyIsDown(32) && !stompAnimating) { // space bar / stomping
     stompAnimating = true;
     stompFrame = 0;
@@ -1194,28 +1607,47 @@ function wouldCollideWithSpike(testX, testY) {
   let hh = PENGUIN_HITBOX.h;
   let ox = PENGUIN_HITBOX.offsetX;
   let oy = PENGUIN_HITBOX.offsetY;
-
-  // WORLD-SPACE penguin hitbox (top-left) at the tested center
   let px = testX + ox;
   let py = testY + oy;
-
   for (let s of spikes) {
     let hb = SPIKE_HITBOXES[s.variant];
     if (!hb) continue;
-
     let hx = s.x + hb.offsetX;
     let hy = s.y + hb.offsetY;
-
-    if (
-      px + hw > hx &&
-      px < hx + hb.w &&
-      py + hh > hy &&
-      py < hy + hb.h
-    ) {
+    if (px + hw > hx && px < hx + hb.w && py + hh > hy && py < hy + hb.h) {
       return true;
     }
   }
   return false;
+}
+
+function checkFishCollision() {
+  if (fish.collected) return;
+
+  // Penguin hitbox in world coordinates
+  let hb = PENGUIN_HITBOX;
+  let px = player.x + hb.offsetX;
+  let py = player.y + hb.offsetY;
+  let pw = hb.w;
+  let ph = hb.h;
+
+  // Fish hitbox
+  let fx = fish.x;
+  let fy = fish.y;
+  let fw = fish.w;
+  let fh = fish.h;
+
+  // AABB collision
+  let overlap =
+    px < fx + fw &&
+    px + pw > fx &&
+    py < fy + fh &&
+    py + ph > fy;
+
+  if (overlap) {
+    fish.collected = true;
+    // Optional: play sound, add score, etc.
+  }
 }
 
 function animateSprite() {
@@ -1322,8 +1754,9 @@ function startWaveForFrame(frameIndex) {
 function drawBlizzardOverlay() {
   let stormLayer = createGraphics(width, height);
 
+  //image(avalanche_test, 0, -200, width, 2400);
   stormLayer.noStroke();
-  stormLayer.fill(255, 255, 255, 251);
+  stormLayer.fill(255, 255, 255, 100);
   stormLayer.rect(0, 0, width, height);
 
   // Convert penguin world → screen
@@ -1484,16 +1917,28 @@ function mouseReleased() {
     return;
   }
 
-  // --- WIN / LOSS LEVEL PICKER BUTTON RELEASE ---
+  // --- WIN / LOSS BUTTON RELEASES ---
   if (gameState === "win" || gameState === "loss") {
-    let bx = width/2, by = height*0.90, bw = 320, bh = 56;
+    // Level Picker button (bottom)
+    let lpBx = width/2, lpBy = height*0.90, lpBw = 320, lpBh = 56;
+    let lpHover =
+      mouseX > lpBx-lpBw/2 && mouseX < lpBx+lpBw/2 &&
+      mouseY > lpBy-lpBh/2 && mouseY < lpBy+lpBh/2;
 
-    let hover =
-      mouseX > bx-bw/2 && mouseX < bx+bw/2 &&
-      mouseY > by-bh/2 && mouseY < by+bh/2;
-
-    if (levelPickerBtnPressed && hover) {
+    if (levelPickerBtnPressed && lpHover) {
       gameState = "level_picker";
+    }
+
+    // Loss "Try Again" button (middle)
+    let lossBx = width/2, lossBy = height*0.45, lossBw = 320, lossBh = 64;
+    let lossHover =
+      mouseX > lossBx-lossBw/2 && mouseX < lossBx+lossBw/2 &&
+      mouseY > lossBy-lossBh/2 && mouseY < lossBy+lossBh/2;
+
+    if (lossBtnPressed && lossHover && gameState === "loss") {
+      resetGame();
+      gameState = "playing";
+      cursor(ARROW);
     }
 
     levelPickerBtnPressed = false;
@@ -1501,6 +1946,7 @@ function mouseReleased() {
     winBtnPressed = false;
     return;
   }
+
 }
 
 
