@@ -31,8 +31,8 @@ After the showcase, we identified two additional improvements that would further
 | `assets/images/a_key_penguin.png`           |                                                              |
 | `assets/images/s_key_penguin.png`           |                                                              |
 | `assets/images/tutorial_background.png`     |                                                              |
-| `assets/images/fish_item.png`               |                                                              |
-| `assets/images/fish_outline.png`            |                                                              |
+| `assets/images/fish_item.png`               | Fish sprite sheet - ChatGPT.com                          [2] |                                       
+| `assets/images/fish_outline.png`            | Fish sprite sheet - ChatGPT.com                          [2] |  
 | `assets/images/spike_tall.png`              |                                                              |
 | `assets/fonts/jersey10.ttf`                 | Jersey10-Regular - Google Fonts.com                      [7] |
 | `assets/images/check_icon.png`              | Iterated game assets - ChatGPT.com                       [4] |
