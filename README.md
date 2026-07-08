@@ -22,18 +22,18 @@ After the showcase, we identified two additional improvements that would further
 | File                                    | Source                                                         |
 | --------------------------------------- | -------------------------------------------------------------- |
 | `assets/images/box_key.png`             |                                                                |
-| `assets/images/bigger_box.png`          |                                                                |
-| `assets/images/info_button.png`         |                                                                |
+| `assets/images/bigger_box.png`          | Box/key tutorial UI asset – ChatGPT.com                    [3] |
+| `assets/images/info_button.png`         | Info/help button icon – ChatGPT.com                        [3] |
 | `assets/images/title_card.png`          | Title Card - ChatGPT.com                                   [5] |
 | `assets/images/w_key_penguin.png`       | Penguin W Key - ChatGPT.com                                [5] |
 | `assets/images/d_key_penguin.png`       | Penguin D Key - ChatGPT.com                                [5] |
 | `assets/images/a_key_penguin.png`       | Penguin A Key - ChatGPT.com                                [5] |
 | `assets/images/s_key_penguin.png`       | Penguin S Key - ChatGPT.com                                [5] |
-| `assets/images/tutorial_background.png` |                                                                |
+| `assets/images/tutorial_background.png` | Tutorial background screen asset – ChatGPT.com             [3] |
 | `assets/images/fish_item.png`           | Fish sprite sheet - ChatGPT.com                            [2] |
 | `assets/images/test_item.png`           | Fish still image  - ChatGPT.com                            [2] |
 | `assets/images/fish_outline.png`        | Fish sprite sheet - ChatGPT.com                            [2] |
-| `assets/images/spike_tall.png`          |                                                                |
+| `assets/images/spike_tall.png`          | Spike obstacle asset – ChatGPT.com                         [4] |
 | `assets/fonts/jersey10.ttf`             | Jersey10-Regular - Google Fonts.com                        [6] |
 | `assets/images/check_icon.png`          | Iterated game assets - ChatGPT.com                         [2] |
 | `assets/images/fish.png`                | Fish sprite sheet - ChatGPT.com                            [2] |
