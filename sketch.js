@@ -352,10 +352,6 @@ function preload() {
   starOutlineImg = loadImage("assets/images/star_outline.png");
   starFilledImg  = loadImage("assets/images/golden_star.png");
 
-
-  avalanche_test = loadImage("assets/images/avalanche_test.png");
-
-  start_penguin = loadImage("assets/images/start_penguin.png");
   tutorialBox = loadImage("assets/images/tutorial_box.png");
   warningOutline = loadImage("assets/images/warning_octo.png");
   boxKey = loadImage("assets/images/box_key.png");
@@ -1866,7 +1862,6 @@ function startWaveForFrame(frameIndex) {
 function drawBlizzardOverlay() {
   let stormLayer = createGraphics(width, height);
 
-  //image(avalanche_test, 0, -200, width, 2400);
   stormLayer.noStroke();
   stormLayer.fill(255, 255, 255, 253);
   stormLayer.rect(0, 0, width, height);
