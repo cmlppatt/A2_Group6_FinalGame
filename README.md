@@ -30,8 +30,8 @@ After the showcase, we identified two additional improvements that would further
 | `assets/images/level_info_box.png`          | Box asset - ChatGPT.com                                  [5] |
 | `assets/images/level_picker.jpg`            | Iterated game assets - ChatGPT.com                       [4] |
 | `assets/images/lock_icon.png`               | Iterated game assets - ChatGPT.com                       [4] |
-| `assets/images/loss_screen.png`             | Screens, spike and penguin sprite sheets - ChatGPT.com  [10] |
-| `assets/images/penguin_avalanche.png`       | Screens, spike and penguin sprite sheets - ChatGPT.com  [10] |
+| `assets/images/loss_screen.png`             | Screens, spike and penguin sprite sheets - ChatGPT.com   [6] |
+| `assets/images/penguin_avalanche.png`       | Screens, spike and penguin sprite sheets - ChatGPT.com   [6] |
 | `assets/images/penguin_front.png`           | Iterated penguin sprite sheets - ChatGPT.com             [5] |
 | `assets/images/penguin_left.png`            | Iterated penguin sprite sheets - ChatGPT.com             [5] |
 | `assets/images/penguin_right.png`           | Iterated penguin sprite sheets - ChatGPT.com             [5] |
