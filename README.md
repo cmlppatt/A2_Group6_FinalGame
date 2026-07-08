@@ -24,11 +24,11 @@ After the showcase, we identified two additional improvements that would further
 | `assets/images/box_key.png`             |                                                                |
 | `assets/images/bigger_box.png`          |                                                                |
 | `assets/images/info_button.png`         |                                                                |
-| `assets/images/title_card.png`          | Title Card                                                 [5] |
-| `assets/images/w_key_penguin.png`       | Penguin W Key                                              [5] |
-| `assets/images/d_key_penguin.png`       | Penguin D Key                                              [5] |
-| `assets/images/a_key_penguin.png`       | Penguin A Key                                              [5] |
-| `assets/images/s_key_penguin.png`       | Penguin S Key                                              [5] |
+| `assets/images/title_card.png`          | Title Card - ChatGPT.com                                   [5] |
+| `assets/images/w_key_penguin.png`       | Penguin W Key - ChatGPT.com                                [5] |
+| `assets/images/d_key_penguin.png`       | Penguin D Key - ChatGPT.com                                [5] |
+| `assets/images/a_key_penguin.png`       | Penguin A Key - ChatGPT.com                                [5] |
+| `assets/images/s_key_penguin.png`       | Penguin S Key - ChatGPT.com                                [5] |
 | `assets/images/tutorial_background.png` |                                                                |
 | `assets/images/fish_item.png`           | Fish sprite sheet - ChatGPT.com                            [2] |
 | `assets/images/test_item.png`           | Fish still image  - ChatGPT.com                            [2] |
