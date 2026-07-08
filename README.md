@@ -22,9 +22,19 @@ After the showcase, we identified two additional improvements that would further
 
 | File                                        | Source                                                       |
 | ------------------------------------------- | -------------------------------------------------------------|
+| `assets/images/box_key.png`                 |                                                              |
+| `assets/images/bigger_box.png`              |                                                              |
+| `assets/images/info_button.png`             |                                                              |
+| `assets/images/title_card.png`              |                                                              |
+| `assets/images/w_key_penguin.png`           |                                                              |
+| `assets/images/d_key_penguin.png`           |                                                              |
+| `assets/images/a_key_penguin.png`           |                                                              |
+| `assets/images/s_key_penguin.png`           |                                                              |
+| `assets/images/tutorial_background.png`     |                                                              |
+| `assets/images/fish_item.png`               |                                                              |
+| `assets/images/fish_outline.png`            |                                                              |
+| `assets/images/spike_tall.png`              |                                                              |
 | `assets/fonts/Jersey10-Regular.ttf`         | Jersey10-Regular - Google Fonts.com                      [7] |
-| `assets/images/background.png`              | Iterated game assets - ChatGPT.com                       [4] |
-| `assets/images/blizzard.png`                | Blizzard asset - ChatGPT.com                             [3] |
 | `assets/images/check_icon.png`              | Iterated game assets - ChatGPT.com                       [4] |
 | `assets/images/fish.png`                    | Fish sprite sheet - ChatGPT.com                          [2] |
 | `assets/images/golden_star.png`             | Iterated game assets - ChatGPT.com                       [4] |
@@ -33,9 +43,6 @@ After the showcase, we identified two additional improvements that would further
 | `assets/images/lock_icon.png`               | Iterated game assets - ChatGPT.com                       [4] |
 | `assets/images/loss_screen.png`             | Screens, spike and penguin sprite sheets - ChatGPT.com   [6] |
 | `assets/images/penguin_avalanche.png`       | Screens, spike and penguin sprite sheets - ChatGPT.com   [6] |
-| `assets/images/penguin_front.png`           | Iterated penguin sprite sheets - ChatGPT.com             [5] |
-| `assets/images/penguin_left.png`            | Iterated penguin sprite sheets - ChatGPT.com             [5] |
-| `assets/images/penguin_right.png`           | Iterated penguin sprite sheets - ChatGPT.com             [5] |
 | `assets/images/penguin_stomp.png`           | Screens, spike and penguin sprite sheets - ChatGPT.com   [6] |
 | `assets/images/spike_double.png`            | Screens, spike and penguin sprite sheets - ChatGPT.com   [6] |
 | `assets/images/spike_mid.png`               | Screens, spike and penguin sprite sheets - ChatGPT.com   [6] |
