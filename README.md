@@ -46,7 +46,7 @@ After the showcase, we identified two additional improvements that would further
 | `assets/images/spike_mid.png`           | Screens, spike and penguin sprite sheets - ChatGPT.com     [4] |
 | `assets/images/spike_small.png`         | Screens, spike and penguin sprite sheets - ChatGPT.com     [4] |
 | `assets/images/star_outline.png`        | Iterated game assets - ChatGPT.com                         [3] |
-| `assets/images/start_penguin.png`       | Screens, spike and penguin sprite sheets - ChatGPT.com     [4] |
+| `assets/images/penguin_front.png`       | Screens, spike and penguin sprite sheets - ChatGPT.com     [4] |
 | `assets/images/start_screen.png`        | Screens, spike and penguin sprite sheets - ChatGPT.com     [4] |
 | `assets/images/tutorial_box.png`        | Warning and box assets - ChatGPT.com                       [1] |
 | `assets/images/warning_octo.png`        | Warning and box assets - ChatGPT.com                       [1] |
