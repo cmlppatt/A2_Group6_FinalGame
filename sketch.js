@@ -324,7 +324,7 @@ let bestStars = { //highest score tracker
 function preload() {
   infoButtonImg = loadImage("assets/images/info_button.png");
   wideBoxImg = loadImage("assets/images/bigger_box.png");
-  gameFont = loadFont("assets/fonts/Jersey10-regular.ttf");
+  gameFont = loadFont("assets/fonts/jersey10.ttf");
   titleImg = loadImage("assets/images/title_card.png");
   SPRITES.up.img = loadImage("assets/images/w_key_penguin.png");
   SPRITES.start_penguin.img = loadImage("assets/images/penguin_front.png");
